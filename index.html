@@ -48,7 +48,12 @@
         .reg-field { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; color: white; font-size: 15px; margin-bottom: 15px; box-sizing: border-box; outline: none; }
         .reg-field:focus { border-color: #00f2fe; }
         .reg-btn { width: 100%; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #0d131a; border: none; padding: 14px; font-weight: bold; border-radius: 12px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        .reg-btn:disabled { background: #555; color: #aaa; cursor: not-allowed; }
     </style>
+    
+    <!-- Подключаем Firebase SDK для работы с базой данных -->
+    <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
 </head>
 <body>
     <div id="regScreen" class="reg-overlay">
@@ -58,9 +63,10 @@
             <input type="email" id="regEmail" class="reg-field" placeholder="Ваш G-mail">
             <input type="text" id="regNick" class="reg-field" placeholder="Придумайте Никнейм">
             <input type="text" id="regPhone" class="reg-field" placeholder="Номер телефона">
-            <button class="reg-btn" onclick="accountRegister()">Создать аккаунт</button>
+            <button id="regBtn" class="reg-btn" onclick="accountRegister()">Создать аккаунт</button>
         </div>
     </div>
+    
     <div class="wrapper">
         <div class="sidebar-left">
             <div class="logo">VibeO</div>
@@ -102,5 +108,3 @@
         <div class="sidebar-right">
             <div class="trend-box">
                 <div class="trend-title">Популярное сейчас</div>
-                <div class="trend-item"><div class="trend-name">#VibeO_Launch</div><div class="trend-count">124K кликов</div></div>
-                <div class="trend-item"><div class="trend-name">#GlobalNetwork</div><div class="trend-count">89K кликов</div></div>
