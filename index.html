@@ -51,21 +51,56 @@
     </style>
 </head>
 <body>
-    <div id="regScreen" class="reg-overlay"><div class="reg-card"><h3>Регистрация в VibeO</h3><p>Создайте всемирный аккаунт</p><input type="email" id="regEmail" class="reg-field" placeholder="Ваш G-mail"><input type="text" id="regNick" class="reg-field" placeholder="Придумайте Никнейм"><input type="text" id="regPhone" class="reg-field" placeholder="Номер телефона"><button class="reg-btn" onclick="accountRegister()">Создать аккаунт</button></div></div>
+    <div id="regScreen" class="reg-overlay">
+        <div class="reg-card">
+            <h3>Регистрация в VibeO</h3>
+            <p>Создайте всемирный аккаунт</p>
+            <input type="email" id="regEmail" class="reg-field" placeholder="Ваш G-mail">
+            <input type="text" id="regNick" class="reg-field" placeholder="Придумайте Никнейм">
+            <input type="text" id="regPhone" class="reg-field" placeholder="Номер телефона">
+            <button class="reg-btn" onclick="accountRegister()">Создать аккаунт</button>
+        </div>
+    </div>
     <div class="wrapper">
-        <div class="sidebar-left"><div class="logo">VibeO</div><div id="uBadge" class="user-badge">@гость</div><div id="m1" class="menu-link active" onclick="sm('m1')">🏠 Главная</div><div id="m2" class="menu-link" onclick="sm('m2')">🔍 Поиск</div><div id="m3" class="menu-link" onclick="sm('m3')">💬 Чаты</div></div>
+        <div class="sidebar-left">
+            <div class="logo">VibeO</div>
+            <div id="uBadge" class="user-badge">@гость</div>
+            <div id="m1" class="menu-link active" onclick="sm('m1')">🏠 Главная</div>
+            <div id="m2" class="menu-link" onclick="sm('m2')">🔍 Поиск</div>
+            <div id="m3" class="menu-link" onclick="sm('m3')">💬 Чаты</div>
+        </div>
         <div class="main-content feed">
             <div id="shortsBlock" class="shorts-card">
-                <div id="videoBox" class="video-box">🎬</div><h2 id="vTitle">Первый ролик в VibeO</h2><div id="aBox" class="author">@world_vibe</div><button id="likeBtn" class="btn-like" onclick="tl()"><span id="lH">🤍</span> <span id="lT">Поставить лайк</span> (<span id="lC">4820</span>)</button>
-                <div id="sBar" class="search-container"><input type="text" id="sInput" class="search-input" placeholder="Поиск шортсов..."><button class="search-btn" onclick="stS()">Найти</button></div>
+                <div id="videoBox" class="video-box">🎬</div>
+                <h2 id="vTitle">Первый ролик в VibeO</h2>
+                <div id="aBox" class="author">@world_vibe</div>
+                <button id="likeBtn" class="btn-like" onclick="tl()">
+                    <span id="lH">🤍</span> <span id="lT">Поставить лайк</span> (<span id="lC">4820</span>)
+                </button>
             </div>
-            <div id="chatsBlock" class="messenger-box">
-                <div class="chat-header-container"><div id="cHeader" class="chat-header-title">💬 Общий чат VibeO</div><div class="user-search-box"><input type="text" id="uSearchInput" class="user-search-input" placeholder="Найти друга по нику..."><button class="user-search-btn" onclick="findUser()">Найти</button></div></div>
-                <div id="cBody" class="chat-body"><div id="welcomeMsg" class="msg-received">Добро пожаловать! Введите ник сверху, чтобы начать личный диалог! 👋</div></div>
-                <div class="chat-footer"><input type="text" id="cInput" class="chat-input" placeholder="Написать сообщение..." onkeydown="if(event.key==='Enter')sendM()"><button class="btn-send" onclick="sendM()">Отправить</button></div>
+            <div id="sBar" class="search-container">
+                <input type="text" id="sInput" class="search-input" placeholder="Поиск шортсов...">
+                <button class="search-btn" onclick="stS()">Найти</button>
+            </div>
+            <div id="mBox" class="messenger-box">
+                <div class="chat-header-container">
+                    <div class="chat-header-title">Глобальный чат VibeO</div>
+                    <div class="user-search-box">
+                        <input type="text" id="uSearchInput" class="user-search-input" placeholder="Поиск собеседника...">
+                        <button class="user-search-btn" onclick="searchUser()">Найти</button>
+                    </div>
+                </div>
+                <div id="cBody" class="chat-body">
+                    <div class="msg-received">Привет! Добро пожаловать в тестовую сеть VibeO! 👋</div>
+                </div>
+                <div class="chat-footer">
+                    <input type="text" id="cInput" class="chat-input" placeholder="Напишите сообщение...">
+                    <button class="btn-send" onclick="sendMsg()">Отправить</button>
+                </div>
             </div>
         </div>
-        <div class="sidebar-right"><div class="trend-box"><div class="trend-title">МИРОВЫЕ ТРЕНДЫ</div><div class="trend-item"><div class="trend-name">#worldwide_shorts</div><div class="trend-count">5.4M просмотров</div></div><div class="trend-item"><div class="trend-name">#vibeo_trends</div><div class="trend-count">1.2M просмотров</div></div></div></div>
-    </div>
-    <script>
-        function accountRegister(){const em=document.getElementById('regEmail').value.trim();let ni=document.getElementById('regNick').value.trim();const ph=document.getElementById('regPhone').value.trim();if(em===''||ni===''||ph===''){alert('Заполните все поля!');return;}if(!ni.startsWith('@'))ni='@'+ni;document.getElementById('uBadge').innerText=ni;document.getElementById('regScreen').style.display='none';}
+        <div class="sidebar-right">
+            <div class="trend-box">
+                <div class="trend-title">Популярное сейчас</div>
+                <div class="trend-item"><div class="trend-name">#VibeO_Launch</div><div class="trend-count">124K кликов</div></div>
+                <div class="trend-item"><div class="trend-name">#GlobalNetwork</div><div class="trend-count">89K кликов</div></div>
