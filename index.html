@@ -86,7 +86,7 @@
         <div class="auth-box">
             <div class="auth-logo">VibeO</div>
             <p class="auth-text">Зарегистрируйтесь, чтобы смотреть фото и видео ваших друзей.</p>
-            <input type="email" id="regEmail" class="auth-input" placeholder="Моб. telephone или эл. адрес">
+            <input type="email" id="regEmail" class="auth-input" placeholder="Моб. телефон или эл. адрес">
             <input type="text" id="regNick" class="auth-input" placeholder="Имя пользователя (Никнейм)">
             <input type="password" id="regPass" class="auth-input" placeholder="Пароль">
             <button id="regBtn" class="auth-btn" onclick="executeRegistration()">Зарегистрироваться</button>
@@ -102,30 +102,37 @@
             <div class="nav-menu">
                 <a class="nav-item active" onclick="switchTab('Главная')"><span class="icon">🏠</span> <span>Главная</span></a>
                 <a class="nav-item" onclick="switchTab('Поиск')"><span class="icon">🔍</span> <span>Поиск</span></a>
-                <a class="nav-item" onclick="switchTab('Сообщения')"><span class="icon">💬</span> <span>Сообщения</span></a>
-                <a class="nav-item" onclick="switchTab('Уведомления')"><span class="icon">❤️</span> <span>Уведомления</span></a>
-                <a class="nav-item" onclick="switchTab('Создать')"><span class="icon">➕</span> <span>Создать</span></a>
-            </div>
-            <div>
-                <div id="userProfileBadge" class="profile-badge">@гость</div>
             </div>
         </div>
+    </div>
 
-        <!-- ЦЕНТРАЛЬНАЯ ЛЕНТА -->
-        <div class="content-area">
+    <!-- ЛОГИКА ПРИЛОЖЕНИЯ (JAVASCRIPT) -->
+    <script>
+        // Функция регистрации
+        function executeRegistration() {
+            // Получаем данные из полей ввода
+            const email = document.getElementById('regEmail').value.trim();
+            const nickname = document.getElementById('regNick').value.trim();
+            const password = document.getElementById('regPass').value.trim();
+
+            // Проверяем, чтобы поля не были пустыми
+            if (email === "" || nickname === "" || password === "") {
+                alert("Пожалуйста, заполните все поля для регистрации!");
+                return;
+            }
+
+            // Прячем экран авторизации
+            document.getElementById('authScreen').style.display = 'none';
             
-            <!-- БЛОК СТОРИС -->
-            <div class="stories-container">
-                <div class="story-item"><div class="story-avatar-ring"><div class="story-avatar">🐱</div></div><div class="story-name">cat_vibe</div></div>
-                <div class="story-item"><div class="story-avatar-ring"><div class="story-avatar">🎮</div></div><div class="story-name">cyber_news</div></div>
-                <div class="story-item"><div class="story-avatar-ring"><div class="story-avatar">🌌</div></div><div class="story-name">nasa_space</div></div>
-                <div class="story-item"><div class="story-avatar-ring"><div class="story-avatar">🎵</div></div><div class="story-name">music_box</div></div>
-                <div class="story-item"><div class="story-avatar-ring"><div class="story-avatar">😎</div></div><div class="story-name">dude_bro</div></div>
-            </div>
+            // Выводим приветственное уведомление
+            alert(`Регистрация успешна! Добро пожаловать, ${nickname}!`);
+        }
 
-            <!-- ЛЕНТА С ПОСТАМИ -->
-            <div class="feed-container">
-                
-                <!-- ПОСТ 1 -->
-                <div class="post-card">
-                    <div class="post-header">
+        // Заглушка для обработки кликов по меню (чтобы не было ошибок в консоли)
+        function switchTab(tabName) {
+            console.log(`Переключение на вкладку: ${tabName}`);
+        }
+    </script>
+
+</body>
+</html>
