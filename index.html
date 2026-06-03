@@ -1,1063 +1,344 @@
 <!DOCTYPE html>
 <html lang="ru">
-<голова>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VibeO</title>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VibeO MAX ULTRA</title>
+
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:корень{
-  --bg:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;--bg4:#242424;
-  --border:#2a2a2a;--text:#f0f0f0;--text2:#999;--text3:#555;
-  --accent:#7c3aed;--accent2:#9f5ff0;--glow:rgba(124,58,237,.22);
-  --danger:#ef4444;--success:#22c55e;--like:#f43f5e;
-  --r:12px;--sw:240px;
+body{
+  margin:0;
+  background:black;
+  color:white;
+  overflow:hidden;
+  font-family:Arial;
 }
-html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
 
-/* ── АВТ ── */
-#auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;
-  background:radial-gradient(ellipse at 25 % 15%,rgba(124,58,237,.2) 0%,transparent 55%),
-             radial-gradient(ellipse at 75 % 85%,rgba(124,58,237,.12) 0%,transparent 50%),var(--bg);}
-.auth-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:38px 34px;width:390px;max-width:94vw;box-shadow:0 0 80px rgba(124,58,237,.15);animation:fadeUp .35s ease both;}
-.auth-logo{text-align:center;margin-bottom:26px;}
-.auth-logo h1{font-size:34px;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,#9f5ff0,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.auth-logo p{color:var(--text2);font-size:13px;margin-top:4px;}
-.auth-tabs{display:flex;gap:4px;background:var(--bg3);border-radius:var(--r);padding:4px;margin-bottom:20px;}
-.auth-tab{flex:1;padding:9px;text-align:center;border-radius:9px;cursor:pointer;font-size:14px;font-weight:500;color:var(--text2);background:none;border:none;transition:.15s;}
-.auth-tab.active{background:var(--accent);color:#fff;}
-.form-group{margin-bottom:13px;}
-.form-group label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);margin-bottom:5px;}
-.form-group input{width:100%;padding:11px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:14px;outline:none;transition:.15s;}
-.form-group input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow);}
-.auth-error{display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);color:var(--danger);border-radius:var(--r);padding:10px 14px;font-size:13px;margin-bottom:12px;}
-.btn-primary{width:100%;padding:13px;background:var(--accent);border:none;border-radius:var(--r);color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px;transition:.15s;}
-.btn-primary:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 4px 20px var(--glow);}
-.btn-primary:active{transform:translateY(0);}
-
-/* ── Оболочка приложения ── */
-#app{display:none;min-height:100vh;}
-.sidebar{width:var(--sw);position:fixed;top:0;left:0;bottom:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;}
-.sidebar-logo{padding:22px 20px 16px;}
-.sidebar-logo span{font-size:24px;font-weight:900;letter-spacing:-.5px;background:linear-gradient(135deg,#9f5ff0,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.sidebar-nav{flex:1;padding:8px 12px;display:flex;flex-direction:column;gap:3px;}
-.nav-btn{display:flex;align-items:center;gap:13px;padding:12px 14px;border-radius:var(--r);cursor:pointer;color:var(--text2);font-size:15px;font-weight:500;background:none;border:none;width:100%;text-align:left;transition:.15s;}
-.nav-btn:hover{фон:var(--bg3);цвет:var(--text);}
-.nav-btn.active{фон:var(--bg3);цвет:var(--text);}
-.nav-btn svg{width:22px;height:22px;flex-shrink:0;}
-.sidebar-foot{padding:12px;border-top:1px solid var(--border);}
-.user-chip{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r);}
-.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#c084fc);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;user-select:none;}
-.avatar.lg{width:80px;height:80px;font-size:28px;}
-.uc-info{flex:1;min-width:0;}
-.uc-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.uc-handle{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.logout-btn{background:none;border:none;cursor:pointer;color:var(--text3);padding:5px;border-radius:8px;transition:.15s;}
-.logout-btn:hover{color:var(--danger);background:rgba(239,68,68,.1);}
-.main{margin-left:var(--sw);min-height:100vh;}
-.page{display:none;padding:24px;max-width:700px;margin:0 auto;}
-.page.active{display:block;}
-.page-title{font-size:21px;font-weight:700;margin-bottom:20px;}
-
-/* ── ОПУБЛИКОВАТЬ КАРТОЧКУ ── */
-.publish-card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:20px;margin-bottom:22px;}
-.pub-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
-.pub-head span{color:var(--text3);font-size:14px;}
-.field-input{width:100%;padding:11px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:14px;outline:none;transition:.15s;font-family:inherit;resize:none;}
-.field-input::placeholder{color:var(--text3);}
-.field-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow);}
-.drop-zone{border:2px dashed var(--border);border-radius:var(--r);padding:26px 20px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:12px;position:relative;}
-.drop-zone:hover,.drop-zone.over{border-color:var(--accent);background:rgba(124,58,237,.06);}
-.dz-icon{width:42px;height:42px;margin:0 auto 10px;color:var(--text3);}
-.dz-text{font-size:14px;font-weight:600;color:var(--text2);margin-bottom:3px;}
-.dz-sub{font-size:12px;color:var(--text3);}
-.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.vid-preview-wrap{display:none;border-radius:var(--r);overflow:hidden;margin-bottom:8px;background:#000;}
-.vid-preview-wrap video{width:100%;max-height:280px;display:block;}
-.vid-name-row{display:none;align-items:center;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:10px;gap:8px;}
-.vid-name-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.remove-vid-btn{background:none;border:none;cursor:pointer;color:var(--text3);padding:2px 7px;border-radius:6px;font-size:12px;white-space:nowrap;transition:.15s;flex-shrink:0;}
-.remove-vid-btn:hover{color:var(--danger);background:rgba(239,68,68,.1);}
-.upload-progress{display:none;margin-bottom:10px;}
-.upload-progress .up-label{font-size:12px;color:var(--text2);margin-bottom:5px;}
-.progress-bar{height:4px;background:var(--bg3);border-radius:4px;overflow:hidden;}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .1s;width:0%;}
-.pub-actions{display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:12px;}
-.pub-hint{font-size:11px;color:var(--text3);}
-.btn-sm{padding:9px 22px;background:var(--accent);border:none;border-radius:9px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:.15s;flex-shrink:0;}
-.btn-sm:hover{background:var(--accent2);transform:translateY(-1px);}
-.btn-sm:active{transform:translateY(0);}
-.btn-sm:disabled{opacity:.5;cursor:not-allowed;transform:none;}
-.btn-follow{padding:8px 20px;background:var(--accent);border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;}
-.btn-follow:hover{background:var(--accent2);}
-.btn-unfollow{padding:8px 20px;background:none;border:1px solid var(--border);border-radius:9px;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;transition:.15s;}
-.btn-unfollow:hover{border-color:var(--danger);color:var(--danger);}
-
-/* ── КОРОТКАЯ КАРТА ── */
-.short-card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:16px 18px;margin-bottom:14px;transition:border-color .15s;animation:fadeUp .25s ease both;}
-.short-card:hover{border-color:rgba(124,58,237,.5);}
-.short-head{display:flex;align-items:center;gap:11px;margin-bottom:12px;cursor:pointer;}
-.s-author{font-size:14px;font-weight:600;}
-.s-time{font-size:12px;color:var(--text3);margin-top:1px;}
-.card-thumb{border-radius:10px;overflow:hidden;margin-bottom:12px;background:#000;aspect-ratio:16/9;position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;}
-.card-thumb video{width:100%;height:100%;object-fit:cover;display:block;}
-.thumb-play{position:absolute;width:46px;height:46px;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none;}
-.card-thumb-grad{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
-.g0{background:linear-gradient(135deg,#1a0533,#3b1a6b);}
-.g1{background:linear-gradient(135deg,#0a1a2e,#0f3460);}
-.g2{background:linear-gradient(135deg,#1a0a0a,#4a1010);}
-.g3{background:linear-gradient(135deg,#0a1a0a,#0f3d1e);}
-.g4{background:linear-gradient(135deg,#1a1500,#3d3000);}
-.g5{background:linear-gradient(135deg,#1a0a1a,#3d1240);}
-.short-card-title{font-size:15px;font-weight:700;margin-bottom:4px;}
-.short-card-desc{font-size:13px;color:var(--text2);margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.card-foot{display:flex;align-items:center;gap:12px;}
-.mini-stat{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text2);}
-.mini-stat.liked{color:var(--like);}
-
-/* ── ЗРИТЕЛЬ ── */
-#viewer{display:none;position:fixed;inset:0;z-index:500;background:#000;flex-direction:row;}
-#viewer.open{display:flex;}
-.viewer-stack{flex:1;position:relative;overflow:hidden;}
-.viewer-slide{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#000;transition:transform .35s cubic-bezier(.4,0,.2,1);}
-.viewer-slide video{width:100%;height:100%;object-fit:contain;display:block;}
-.vs-grad-bg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.8);}
-.v-top-fade{position:absolute;top:0;left:0;right:0;height:120px;background:linear-gradient(to bottom,rgba(0,0,0,.7),transparent);pointer-events:none;z-index:2;}
-.v-bot-fade{position:absolute;bottom:0;left:0;right:190px;height:240px;background:linear-gradient(to top,rgba(0,0,0,.8),transparent);pointer-events:none;z-index:2;}
-.v-info{position:absolute;bottom:0;left:0;right:190px;padding:0 16px 24px;z-index:3;}
-.v-author-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;cursor:pointer;}
-.av-sm{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#c084fc);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,.3);}
-.v-author-name{font-size:14px;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.8);}
-.v-author-handle{font-size:12px;color:rgba(255,255,255,.7);}
-.v-title-text{font-size:15px;font-weight:700;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.8);margin-bottom:4px;}
-.v-desc-text{font-size:13px;color:rgba(255,255,255,.8);text-shadow:0 1px 4px rgba(0,0,0,.7);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-
-/* Правая полоса действия */
-.viewer-actions{position:absolute;right:0;bottom:0;width:72px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:30px;gap:20px;z-index:4;}
-.vact{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;background:none;border:none;color:#fff;font-size:12px;font-weight:600;padding:0;}
-.vact-icon{width:46px;height:46px;background:rgba(255,255,255,.13);backdrop-filter:blur(8px);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.15s;}
-.vact:hover .vact-icon{background:rgba(255,255,255,.25);}
-.vact.liked .vact-icon{background:rgba(244,63,94,.3);}
-.vact-label{color:rgba(255,255,255,.9);font-size:12px;}
-
-/* Верхняя панель просмотра */
-.viewer-topbar{position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;}
-.viewer-counter-pill{background:rgba(0,0,0,.45);backdrop-filter:blur(8px);color:#fff;font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;}
-.viewer-nav-btns{display:flex;gap:8px;}
-.vn-btn{background:rgba(0,0,0,.45);backdrop-filter:blur(8px);border:none;cursor:pointer;color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.15s;}
-.vn-btn:hover{background:rgba(0,0,0,.7);}
-.vn-btn:disabled{opacity:.28;cursor:default;}
-.viewer-close-btn{background:rgba(0,0,0,.45);backdrop-filter:blur(8px);border:none;cursor:pointer;color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.15s;}
-.viewer-close-btn:hover{background:rgba(0,0,0,.7);}
-
-/* ── ПАНЕЛЬ КОММЕНТАРЕВ ── */
-.comments-panel{width:340px;background:var(--bg2);display:flex;flex-direction:column;border-left:1px solid var(--border);flex-shrink:0;z-index:5;}
-.cp-header{padding:15px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.cp-header h3{font-size:15px;font-weight:700;}
-.cp-count{color:var(--text3);font-weight:400;font-size:14px;}
-.cp-list{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:12px;}
-.cp-empty{text-align:center;color:var(--text3);padding:40px 0;font-size:13px;}
-.comment-item{display:flex;gap:10px;}
-.comment-body{flex:1;}
-.comment-author{font-size:13px;font-weight:600;}
-.comment-handle{font-size:11px;color:var(--text3);}
-.comment-text{font-size:13px;color:var(--text2);line-height:1.5;margin-top:2px;}
-.comment-time{font-size:11px;color:var(--text3);margin-top:3px;}
-.cp-input-row{padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;}
-.cp-input{flex:1;padding:9px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text);font-size:13px;outline:none;transition:.15s;font-family:inherit;}
-.cp-input:focus{border-color:var(--accent);}
-.cp-send-btn{background:var(--accent);border:none;cursor:pointer;color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;}
-.cp-send-btn:hover{background:var(--accent2);}
-
-/* ── ПОИСК ── */
-.search-wrap{position:relative;margin-bottom:18px;}
-.search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;}
-.search-input{width:100%;padding:12px 14px 12px 42px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:14px;outline:none;transition:.15s;}
-.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow);}
-.s-tabs{display:flex;gap:8px;margin-bottom:18px;}
-.s-tab{padding:7px 18px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:.15s;}
-.s-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
-.user-row{display:flex;align-items:center;gap:12px;padding:13px 15px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:border-color .15s;}
-.user-row:hover{border-color:rgba(124,58,237,.5);}
-.ur-name{font-size:14px;font-weight:600;}
-.ur-handle{font-size:12px;color:var(--text2);}
-
-/* ── ПРОФИЛЬ ── */
-.profile-hdr{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:18px;}
-.profile-top{display:flex;align-items:flex-start;gap:18px;margin-bottom:18px;}
-.p-name{font-size:21px;font-weight:800;}
-.p-handle{font-size:13px;color:var(--text2);margin-top:2px;margin-bottom:10px;}
-.stats{display:flex;gap:22px;flex-wrap:wrap;}
-.stat .v{font-size:20px;font-weight:700;}
-.stat .l{font-size:12px;color:var(--text2);margin-top:1px;}
-.sec-title{font-size:15px;font-weight:700;margin-bottom:12px;}
-.empty{text-align:center;padding:48px 20px;color:var(--text3);}
-.empty p{font-size:14px;margin-top:12px;}
-
-/* ── МОДАЛЬНОЕ ОКНО ── */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(5px);}
-.modal-bg.open{display:flex;}
-.modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;width:520px;max-width:94vw;max-height:85vh;overflow-y:auto;padding:26px;position:relative;animation:fadeUp .2s ease both;}
-.modal-close-btn{position:absolute;top:14px;right:14px;width:30px;height:30px;background:var(--bg3);border:none;cursor:pointer;color:var(--text2);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.15s;}
-.modal-close-btn:hover{background:var(--bg4);color:var(--text);}
-
-/* ── ТОСТ ── */
-#toast{position:fixed;bottom:26px;right:26px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:11px 18px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transform:translateY(8px);transition:all .22s ease;pointer-events:none;max-width:300px;}
-#toast.show{opacity:1;transform:translateY(0);}
-#toast.ok{border-color:var(--success);color:var(--success);}
-#toast.err{border-color:var(--danger);color:var(--danger);}
-
-/* ── АДАПТИВНЫЙ ── */
-@media(max-width:900px){
-  .comments-panel{width:280px;}
+#app{
+  height:100vh;
+  width:100vw;
+  position:relative;
 }
-@media(max-width:720px){
-  :root{--sw:64px;}
-  .sidebar-logo{text-align:center;padding:16px 8px;}
-  .sidebar-logo span{font-size:18px;}
-  .nav-btn span{display:none;}
-  .nav-btn{justify-content:center;padding:13px;}
-  .uc-info,.logout-btn{display:none;}
-  .user-chip{justify-content:center;}
-  .page{padding:14px;}
-  #viewer{flex-direction:column;}
-  .v-bot-fade{right:0;}
-  .v-info{right:0;}
-  .viewer-actions{flex-direction:row;bottom:auto;top:50%;right:0;width:auto;padding:0 12px;transform:translateY(-50%);gap:14px;}
-  .comments-panel{width:100%;border-left:none;border-top:1px solid var(--border);max-height:45vh;}
-}
-@media(max-width:480px){.auth-box{padding:28px 18px;}}
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
-@keyframes pop{0%,100%{transform:scale(1);}40%{transform:scale(1.4);}}
-.pop{animation:pop .22s ease;}
-::-webkit-scrollbar{width:5px;}
-::-webkit-scrollbar-track{background:var(--bg);}
-::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px;}
+/* ===== POST ===== */
+.post{
+  height:100vh;
+  width:100vw;
+  display:none;
+  position:absolute;
+  top:0; left:0;
+}
+
+.post.active{display:block;}
+
+video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  position:absolute;
+  top:0; left:0;
+  z-index:-2;
+}
+
+.overlay{
+  position:absolute;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.35);
+  z-index:-1;
+}
+
+/* ===== UI ===== */
+.info{
+  position:absolute;
+  bottom:120px;
+  left:15px;
+}
+
+.user{
+  font-size:14px;
+  opacity:0.9;
+}
+
+.title{
+  font-size:24px;
+  font-weight:bold;
+}
+
+.stats{
+  font-size:12px;
+  opacity:0.7;
+  margin-top:5px;
+}
+
+/* right panel */
+.right{
+  position:absolute;
+  right:15px;
+  bottom:120px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.btn{
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  border:none;
+  cursor:pointer;
+  background:rgba(255,255,255,0.15);
+  color:white;
+  font-size:18px;
+}
+
+/* top bar */
+.top{
+  position:absolute;
+  top:10px;
+  left:10px;
+  right:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+input{
+  width:55%;
+  padding:8px;
+  border-radius:8px;
+  border:none;
+}
+
+/* upload */
+.upload{
+  position:absolute;
+  bottom:20px;
+  left:15px;
+  background:white;
+  color:black;
+  padding:10px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+/* heart animation */
+.heart{
+  position:absolute;
+  font-size:30px;
+  animation:float 1s forwards;
+}
+
+@keyframes float{
+  0%{transform:translateY(0);opacity:1;}
+  100%{transform:translateY(-150px);opacity:0;}
+}
 </style>
 </head>
-<тело>
 
-<!-- ═══ AUTH ═══ -->
-<div id="auth-screen">
-  <div class="auth-box">
-    <div class="auth-logo"><h1>VibeO</h1><p>Делись своими моментами</p></div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login">Войти</button>
-      <button class="auth-tab" id="tab-reg">Регистрация</button>
-    </div>
-    <div id="auth-error" class="auth-error"></div>
-    <div id="form-login">
-      <div class="form-group"><label>Email or nikneym</label><input type="text" id="login-id" placeholder="email or @nickname" autocomplete="username"></div>
-      <div class="form-group"><label>Пароль</label><input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"></div>
-      <button class="btn-primary" id="btn-login">Войти</button>
-    </div>
-    <div id="form-reg" style="display:none">
-      <div class="form-group"><label>Имя</label><input type="text" id="reg-name" placeholder="Твоё имя"></div>
-      <div class="form-group"><label>Электронная почта <span style="color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0">(один аккаунт на email)</span></label><input type="email" id="reg-email" placeholder="example@mail.com" autocomplete="email"></div>
-      <div class="form-group"><label>Никнейм</label><input type="text" id="reg-nick" placeholder="yourname"></div>
-      <div class="form-group"><label>Пароль</label><input type="password" id="reg-pass" Placeholder="Минимум 4 символа" autocomplete="new-password"></div>
-      <button class="btn-primary" id="btn-reg">Создать аккаунт</button>
-    </div>
-  </div>
+<body>
+
+<div id="app"></div>
+
+<div class="top">
+  <div>🔥 VibeO MAX</div>
+  <input id="search" placeholder="поиск..." oninput="render()"/>
 </div>
 
-<!-- ═══ APP ═══ -->
-<div id="app">
-  <aside class="sidebar">
-    <div class="sidebar-logo"><span>VibeO</span></div>
-    <nav class="sidebar-nav">
-      <button class="nav-btn active" data-page="home" id="nav-home">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        <span>Главная</span>
-      </button>
-      <button class="nav-btn" data-page="search" id="nav-search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        Поиск</span>
-      </button>
-      <button class="nav-btn" data-page="profile" id="nav-profile">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span>Профиль</span>
-      </button>
-    </nav>
-    <div class="sidebar-foot">
-      <div class="user-chip">
-        <div class="avatar" id="sb-av"></div>
-        <div class="uc-info"><div class="uc-name" id="sb-name"></div><div class="uc-handle" id="sb-handle"></div></div>
-        <button class="logout-btn" id="btn-logout" title="Выйти">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        </button>
-      </div>
-    </div>
-  </aside>
-
-  <main class="main">
-    <!-- ГЛАВНАЯ -->
-    <div class="page active" id="page-home">
-      <div class="page-title">Лента</div>
-      <div class="publish-card">
-        <div class="pub-head"><div class="avatar" id="pub-av"></div><span>Загрузить свои шорты</span></div>
-        <div class="drop-zone" id="drop-zone">
-          <input type="file" id="vid-file" accept="video/*">
-          <svg class="dz-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 10l4.553-2.069A1 1 0 0 1 21 8.87v6.26a1 1 0 0 1-1.447.899L15 14M3 8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z"/></svg>
-          <div class="dz-text">Нажми или перетащи видео</div>
-          <div class="dz-sub">MP4, MOV, WebM · до 80 МБ</div>
-        </div>
-        <div class="vid-preview-wrap" id="vid-preview-wrap"><video id="vid-preview" controls preload="metadata"></video></div>
-        <div class="vid-name-row" id="vid-name-row"><span id="vid-filename"></span><button class="remove-vid-btn" id="btn-remove-vid">✕ Удалить</button></div>
-        <div class="upload-progress" id="upload-progress"><div class="up-label" id="up-label">0%</div><div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div></div>
-        <input type="text" class="field-input" id="pub-title" placeholder="Название шортса *" style="margin-bottom:8px">
-        <textarea class="field-input" id="pub-desc" Placeholder="Описание (необязательно)" rows="2"></textarea>
-        <div class="pub-actions">
-          <span class="pub-hint" id="pub-hint"></span>
-          <button class="btn-sm" id="btn-publish">Опубликовать</button>
-        </div>
-      </div>
-      <div id="feed"></div>
-    </div>
-
-    <!-- ПОИСК -->
-    <div class="page" id="page-search">
-      <div class="page-title">Поиск</div>
-      <div class="search-wrap">
-        <svg class="search-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input class="search-input" id="search-q" placeholder="Введи запрос...">
-      </div>
-      <div class="s-tabs">
-        <button class="s-tab active" id="stab-users">Пользователи</button>
-        <button class="s-tab" id="stab-shorts">Шорты</button>
-      </div>
-      <div id="search-out"></div>
-    </div>
-
-    <!-- ПРОФИЛЬ -->
-    <div class="page" id="page-profile"><div id="profile-out"></div></div>
-  </main>
+<div class="right">
+  <button class="btn" onclick="like()">❤️</button>
+  <button class="btn" onclick="follow()">➕</button>
+  <button class="btn" onclick="bookmark()">🔖</button>
 </div>
 
-<!-- ═══ VIEWER ═══ -->
-<div id="viewer">
-  <div class="viewer-stack" id="viewer-stack">
-    <!-- добавлены слайды -->
-  </div>
-
-  <!-- верхняя панель -->
-  <div class="viewer-topbar">
-    <div class="viewer-counter-pill" id="viewer-counter">1 / 1</div>
-    <div class="viewer-nav-btns">
-      <button class="vn-btn" id="btn-vnav-up" title="Предыдущий">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
-      </button>
-      <button class="vn-btn" id="btn-vnav-down" title="Следующий">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <button class="viewer-close-btn" id="btn-viewer-close" title="Закрыть">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-  </div>
-
-  <!-- панель комментариев (всегда видна сбоку) -->
-  <div class="comments-panel" id="comments-panel">
-    <div class="cp-header">
-      <h3>Комментарии <span class="cp-count" id="cp-count"></span></h3>
-    </div>
-    <div class="cp-list" id="cp-list"></div>
-    <div class="cp-input-row">
-      <input class="cp-input" id="cp-input" Placeholder="Написать комментарий...">
-      <button class="cp-send-btn" id="btn-cp-send">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-      </button>
-    </div>
-  </div>
+<div class="upload">
+  <input type="file" accept="video/*" onchange="uploadVideo(event)">
 </div>
-
-<!-- МОДАЛЬНОЕ (Профиль пользователя) -->
-<div class="modal-bg" id="modal-bg">
-  <div class="modal-box">
-    <button class="modal-close-btn" id="btn-modal-close">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <div id="modal-out"></div>
-  </div>
-</div>
-
-<div id="toast"></div>
 
 <script>
-// ══════════════════════════════════════
-// ХРАНИЛИЩЕ
-// ══════════════════════════════════════
-function store(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){showToast('Мало места. Удали старые шорты.','err');}}
-function load(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
-
-var UK='vb3_users', SK='vb3_shorts', CK='vb3_comments', SESK='vb3_session';
-function getUsers() {return load(UK,[]);}
-function getShorts() {return load(SK,[]);}
-function getComments() {return load(CK,[]);}
-function saveUsers(d) {store(UK,d);}
-function saveShorts(d) {store(SK,d);}
-function saveComments(d){store(CK,d);}
-
-// ══════════════════════════════════════
-// СОСТОЯНИЕ
-// ══════════════════════════════════════
-var me = null;
-var searchTab = 'users';
-вар videoB64 = ноль; // ожидающая загрузки base64
-var viewerList = []; // сокращает массив в viewer
-var viewerIdx = 0;
-var profileUID = null; // чей профиль отображается
-
-// ══════════════════════════════════════
-// ПОМОЩНИКИ
-// ══════════════════════════════════════
-function esc(s){return String(s).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"').replace(/'/g,''');}
-function initials(n){return(n||'?').trim().split(/\s+/).map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);}
-function назад(ts){var d=Math.floor((Date.now()-ts)/1000);if(d<60)return'только что';if(d<3600)return Math.floor(d/60)+' мин. назад';if(d<86400)return Math.floor(d/3600)+' ч. назад';return Math.floor(d/86400)+' дн. назад';}
-function gc(id){var h=0;for(var i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))>>>0;return'g'+(h%6);}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
-function fmtSize(b){return b<1048576?(b/1024).toFixed(0)+' КБ':(b/1048576).toFixed(1)+' МБ';}
-function isEmail(e){return/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);}
-
-function showToast(msg,cls){
-  var el=document.getElementById('toast');
-  el.textContent=msg; el.className='show'+(cls?' '+cls:'');
-  clearTimeout(el._t); el._t=setTimeout(function(){el.className='';},3200);
-}
-
-// ── Следуйте ─
-function isFollowing(uid){return me&&(me.following||[]).indexOf(uid)!==-1;}
-function followerCount(uid){return getUsers().filter(function(u){return(u.following||[]).indexOf(uid)!==-1;}).length;}
-function followingCount(uid){var u=getUsers().find(function(x){return x.id===uid;});return u?(u.following||[]).length:0;}
-function doFollow(targetId){
-  var users=getUsers();
-  var u = users.find(function(x) { return x.id === me.id; });
-  if(!u)return;
-  if(!u.following)u.following=[];
-  var i=u.following.indexOf(targetId);
-  if(i===-1)u.following.push(targetId);else u.following.splice(i,1);
-  saveUsers(users);
-  me=u;
-}
-
-// ══════════════════════════════════════
-// АВТ
-// ══════════════════════════════════════
-function authErr(m){var e=document.getElementById('auth-error');e.textContent=m;e.style.display='';}
-function authErrClear(){document.getElementById('auth-error').style.display='none';}
-
-function switchTab(t){
-  var isL=(t==='login');
-  document.getElementById('form-login').style.display=isL?'':'none';
-  document.getElementById('form-reg').style.display=isL?'none':'';
-  document.getElementById('tab-login').classList.toggle('active',isL);
-  document.getElementById('tab-reg').classList.toggle('active',!isL);
-  authErrClear();
-}
-
-function doRegister(){
-  var name = document.getElementById('reg-name').value.trim();
-  var email = document.getElementById('reg-email').value.trim().toLowerCase();
-  var nick = document.getElementById('reg-nick').value.trim().replace(/^@/,'').toLowerCase();
-  var pass = document.getElementById('reg-pass').value;
-  if(!name) return authErr('Введи имя');
-  if(!isEmail(email)) return authErr('Введи правильный адрес электронной почты');
-  if(nick.length<2) return authErr('Никнейм минимум 2 символа');
-  if(!/^[a-z0-9_.]+$/.test(ник)) return authErr('Никнейм: латиница, цифры, _ и .');
-  if(pass.length<4) return authErr('Пароль минимум 4 символа');
-  var users=getUsers();
-  if(users.find(function(u){return u.email===email;})) return authErr('Этот адрес электронной почты уже зарегистрирован');
-  if(users.find(function(u){return u.nick===ник;})) return authErr('Никнейм уже занят');
-  var user={id:uid(),name:name,email:email,nick:nick,pass:pass,following:[],createdAt:Date.now()};
-  users.push(user); saveUsers(users);
-  store(SESK,user.id);
-  showToast('Добро пожаловать, '+name+'!','ok');
-  startApp(user);
-}
-
-function doLogin(){
-  var id = document.getElementById('login-id').value.trim().toLowerCase().replace(/^@/,'');
-  var pass = document.getElementById('login-pass').value;
-  if(!id||!pass) return authErr('Заполни все поля');
-  var user = getUsers().find(function(u) { return (u.nick === id || u.email === id) && u.pass === pass; });
-  if(!user) return authErr('Неверный логин или пароль');
-  store(SESK,user.id);
-  showToast('С возвращением, '+user.name+'!','ok');
-  startApp(user);
-}
-
-// ══════════════════════════════════════
-// ЗАПУСК ПРИЛОЖЕНИЯ / ВЫХОД
-// ══════════════════════════════════════
-function startApp(user){
-  me=user;
-  document.getElementById('auth-screen').style.display='none';
-  document.getElementById('app').style.display='flex';
-  document.getElementById('sb-av').textContent=initials(user.name);
-  document.getElementById('sb-name').textContent=user.name;
-  document.getElementById('sb-handle').textContent='@'+user.nick;
-  document.getElementById('pub-av').textContent=initials(user.name);
-  goPage('home');
-}
-function doLogout(){
-  store(SESK,null); me=null;
-  clearVideo();
-  if(viewerIsOpen()) closeViewer();
-  document.getElementById('app').style.display='none';
-  document.getElementById('auth-screen').style.display='flex';
-  document.getElementById('login-id').value='';
-  document.getElementById('login-pass').value='';
-  switchTab('login');
-}
-
-// ══════════════════════════════════════
-// НАВИГАЦИЯ
-// ══════════════════════════════════════
-function goPage(pg){
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
-  document.getElementById('page-'+pg).classList.add('active');
-  var nb=document.getElementById('nav-'+pg);
-  if(nb) nb.classList.add('active');
-  if(pg==='home') renderFeed();
-  if(pg==='search') renderSearch();
-  if(pg==='profile') {profileUID=me.id; renderProfile(me.id,'profile-out');}
-}
-
-// ══════════════════════════════════════
-// ЗАГРУЗКА ВИДЕО
-// ══════════════════════════════════════
-function handleVideoFile(file){
-  if(!file)return;
-  if(!file.type.startsWith('video/')){showToast('Выбери видеофайл','err');return;}
-  if(file.size>80*1024*1024){showToast('Файл слишком большой (макс 80 МБ)','err');return;}
-
-  var prog=document.getElementById('upload-progress');
-  var fill=document.getElementById('progress-fill');
-  var lbl=document.getElementById('up-label');
-  prog.style.display=''; fill.style.width='0%';
-  document.getElementById('btn-publish').disabled=true;
-  document.getElementById('drop-zone').style.display='none';
-
-  var reader = new FileReader();
-  reader.onprogress=function(e){
-    if(e.lengthComputable){var p=Math.round(e.loaded/e.total*100);fill.style.width=p+'%';lbl.textContent='Обработка '+p+'%';}
-  };
-  reader.onload=function(e){
-    fill.style.width='100%'; lbl.textContent='Готово!';
-    setTimeout(function(){prog.style.display='none';},500);
-    videoB64=e.target.result;
-    var vw=document.getElementById('vid-preview-wrap');
-    document.getElementById('vid-preview').src=videoB64;
-    vw.style.display='';
-    document.getElementById('vid-filename').textContent=file.name+' ('+fmtSize(file.size)+')';
-    document.getElementById('vid-name-row').style.display='flex';
-    document.getElementById('pub-hint').textContent='Размер: '+fmtSize(file.size);
-    document.getElementById('btn-publish').disabled=false;
-  };
-  reader.onerror=function(){
-    prog.style.display='none';
-    document.getElementById('drop-zone').style.display='';
-    document.getElementById('btn-publish').disabled=false;
-    showToast('Ошибка чтения файла','err');
-  };
-  reader.readAsDataURL(file);
-}
-
-function clearVideo(){
-  videoB64=null;
-  var v=document.getElementById('vid-preview');
-  if(v){v.pause();v.src='';}
-  document.getElementById('vid-preview-wrap').style.display='none';
-  document.getElementById('vid-name-row').style.display='none';
-  document.getElementById('drop-zone').style.display='';
-  document.getElementById('pub-hint').textContent='';
-  document.getElementById('vid-file').value='';
-  document.getElementById('upload-progress').style.display='none';
-  document.getElementById('btn-publish').disabled=false;
-}
-
-// перетаскивание
-var dz=document.getElementById('drop-zone');
-dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('over');});
-dz.addEventListener('dragleave',function(){dz.classList.remove('over');});
-dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('over');if(e.dataTransfer.files[0])handleVideoFile(e.dataTransfer.files[0]);});
-document.getElementById('vid-file').addEventListener('change',function(e){if(e.target.files[0])handleVideoFile(e.target.files[0]);});
-
-// ══════════════════════════════════════
-// ОПУБЛИКОВАТЬ
-// ══════════════════════════════════════
-function doPublish(){
-  var title=document.getElementById('pub-title').value.trim();
-  var desc=document.getElementById('pub-desc').value.trim();
-  if(!title){showToast('Введи название','err');return;}
-  if(!videoB64){showToast('Сначала выбери видео','err');return;}
-  var shorts=getShorts();
-  пытаться{
-    shorts.unshift({id:uid(),authorId:me.id,authorNick:me.nick,authorName:me.name,
-      title:title,desc:desc,video:videoB64,likes:[],createdAt:Date.now()});
-    saveShorts(shorts);
-  }catch(e){showToast('Недостаточно места. Удали старые шорты.','err');return;}
-  document.getElementById('pub-title').value='';
-  document.getElementById('pub-desc').value='';
-  clearVideo();
-  showToast('Короткое описание опубликовано!','ok');
-  renderFeed();
-}
-
-// ══════════════════════════════════════
-// ЛАЙК / УДАЛЕНИЕ
-// ══════════════════════════════════════
-function toggleLike(shortId){
-  var shorts=getShorts();
-  var s = shorts.find(function(x) { return x.id === shortId; });
-  if(!s)return;
-  var i=s.likes.indexOf(me.id);
-  if(i===-1)s.likes.push(me.id);else s.likes.splice(i,1);
-  saveShorts(shorts);
-  renderFeed();
-  // Обновить данные средства просмотра, если оно открыто
-  if(viewerIsOpen()){
-    viewerList = getShorts(); // поддерживать синхронизацию
-    renderViewerActions();
+/* ===== DATA ===== */
+let posts = JSON.parse(localStorage.getItem("vibeo_max") || "null") || [
+  {
+    user:"@neo",
+    title:"Welcome to VibeO",
+    video:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+    likes:0,
+    views:0,
+    followers:0,
+    bookmarked:false
+  },
+  {
+    user:"@alpha",
+    title:"Level MAX",
+    video:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+    likes:0,
+    views:0,
+    followers:0,
+    bookmarked:false
   }
-}
-function doDeleteShort(shortId){
-  if(!confirm('Удалить эти шорты?')) return;
-  saveShorts(getShorts().filter(function(s){return s.id!==shortId;}));
-  saveComments(getComments().filter(function(c){return c.shortId!==shortId;}));
-  showToast('Удалено');
-  if(viewerIsOpen())closeViewer();
-  renderFeed();
-}
+];
 
-// ══════════════════════════════════════
-// HTML-код короткой карточки (использует data-sid = короткий ID)
-// ══════════════════════════════════════
-function shortCardHTML(s){
-  var liked=s.likes.indexOf(me.id)!==-1;
-  var cmtCount = getComments().filter(function(c) { return c.shortId === s.id; }).length;
-  var thumbHTML=s.video
-    ?'<div class="card-thumb" data-open-sid="'+esc(s.id)+'">'
-        +'<video preload="none" muted><source src="'+s.video+'"></video>'
-        +'<div class="thumb-play"><svg width="18" height="18" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>'
-      +'</div>'
-    :'<div class="card-thumb '+gc(s.id)+'" data-open-sid="'+esc(s.id)+'">'
-        +'<div class="card-thumb-grad"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5"><path d="M15 10l4.553-2.069A1 1 0 0 1 21 8.87v6.26a1 1 0 0 1-1.447.899L15 14M3 8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z"/></svg></div>'
-      +'</div>';
+let index = 0;
 
-  return '<div class="short-card">'
-    +'<div class="short-head" data-open-uid="'+esc(s.authorId)+'">'
-      +'<div class="avatar">'+initials(s.authorName)+'</div>'
-      +'<div><div class="s-author">'+esc(s.authorName)+'</div><div class="s-time">@'+esc(s.authorNick)+' · '+ago(s.createdAt)+'</div></div>'
-    +'</div>'
-    +thumbHTML
-    +'<div class="short-card-title" data-open-sid="'+esc(s.id)+'">'+esc(s.title)+'</div>'
-    +(s.desc?'<div class="short-card-desc">'+esc(s.desc)+'</div>':'')
-    +'<div class="card-foot">'
-      +'<span class="mini-stat'+(liked?' liked':'')+'" data-like-sid="'+esc(s.id)+'" style="cursor:pointer">'
-        +'<svg width="14" height="14" viewBox="0 0 24 24" fill="'+(liked?'var(--like)':'none')+'" stroke="'+(liked?'var(--like)':'currentColor')+'" stroke-width="2" style="pointer-events:none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'
-        +s.likes.length
-      +'</span>'
-      +'<span class="mini-stat" data-open-sid="'+esc(s.id)+'" style="cursor:pointer">'
-        +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
-        +cmtCount
-      +'</span>'
-      +(s.authorId===me.id
-        ?'<span data-del-sid="'+esc(s.id)+'" style="margin-left:auto;cursor:pointer;color:var(--text3);padding:4px;border-radius:6px;transition:.15s" title="Удалить">'
-          +'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>'
-        +'</span>'
-        :'')
-    +'</div>'
-  +'</div>';
+/* ===== SAVE ===== */
+function save(){
+  localStorage.setItem("vibeo_max", JSON.stringify(posts));
 }
 
-// ══════════════════════════════════════
-// КОРМИТЬ
-// ══════════════════════════════════════
-function renderFeed(){
-  var shorts=getShorts();
-  var el=document.getElementById('feed');
-  if(!shorts.length){
-    el.innerHTML='<div class="empty"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" штрих="currentColor" штрих-ширина="1.5" opacity=".3"><path d="M15 10l4.553-2.069A1 1 0 0 1 21 8.87v6.26a1 1 0 0 1-1.447.899L15 14M3 8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z"/></svg><p>Загрузить первые шорты!</p></div>';
-    возвращаться;
-  }
-  el.innerHTML = shorts.map(shortCardHTML).join('');
+/* ===== SEARCH FILTER ===== */
+function getFiltered(){
+  let q = document.getElementById("search").value.toLowerCase();
+  return posts.filter(p =>
+    p.title.toLowerCase().includes(q) ||
+    p.user.toLowerCase().includes(q)
+  );
 }
 
-// ══════════════════════════════════════
-// ПОИСК
-// ══════════════════════════════════════
-function renderSearch(){
-  var q = document.getElementById('search-q').value.trim().toLowerCase();
-  var el=document.getElementById('search-out');
-  if(searchTab==='users'){
-    var users = getUsers().filter(function(u) { return u.id !== me.id; });
-    var res=q?users.filter(function(u){return u.nick.indexOf(q)!==-1||u.name.toLowerCase().indexOf(q)!==-1||u.email.indexOf(q)!==-1;}):users;
-    if(!res.length){el.innerHTML='<div class="empty"><p>Пользователи не найдены</p></div>';return;}
-    el.innerHTML=res.map(function(u){
-      return '<div class="user-row" data-open-uid="'+esc(u.id)+'">'
-        +'<div class="avatar">'+initials(u.name)+'</div>'
-        +'<div><div class="ur-name">'+esc(u.name)+'</div><div class="ur-handle">@'+esc(u.nick)+'</div></div>'
-        +'<svg style="margin-left:auto;color:var(--text3)" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>'
-      +'</div>';
-    }).присоединиться('');
-  }еще{
-    var shorts=getShorts();
-    var res2=q?shorts.filter(function(s){return s.title.toLowerCase().indexOf(q)!==-1||(s.desc||'').toLowerCase().indexOf(q)!==-1;}):shorts;
-    if(!res2.length){el.innerHTML='<div class="empty"><p>Шорты не найдены</p></div>';return;}
-    el.innerHTML=res2.map(shortCardHTML).join('');
-  }
-}
+/* ===== RENDER ===== */
+const app = document.getElementById("app");
 
-// ══════════════════════════════════════
-// ПРОФИЛЬ
-// ══════════════════════════════════════
-function renderProfile(userId, containerId){
-  var user = getUsers().find(function(u) { return u.id === userId; });
-  if(!user)return;
-  var shorts = getShorts().filter(function(s) { return s.authorId === userId; });
-  var totalLikes=shorts.reduce(function(a,s){return a+s.likes.length;},0);
-  var isOwn=(userId===me.id);
-  var following=isFollowing(userId);
-  document.getElementById(containerId).innerHTML=
-    '<div class="profile-hdr">'
-      +'<div class="profile-top">'
-        +'<div class="avatar lg">'+initials(user.name)+'</div>'
-        +'<div style="flex:1">'
-          +'<div class="p-name">'+esc(user.name)+'</div>'
-          +'<div class="p-handle">@'+esc(user.nick)+'</div>'
-          +(isOwn
-            ?'<div style="font-size:12px;color:var(--text3);margin-top:2px">'+esc(user.email)+'</div>'
-            :'<div style="margin-top:10px">'
-              +(следующий)
-                ?'<button class="btn-unfollow" data-do-unfollow="'+esc(userId)+'">Отписаться</button>'
-                :'<button class="btn-follow" data-do-follow="'+esc(userId)+'">Подписаться</button>')
-            +'</div>')
-        +'</div>'
-      +'</div>'
-      +'<div class="stats">'
-        +'<div class="stat"><div class="v">'+shorts.length+'</div><div class="l">Шортсов</div></div>'
-        +'<div class="stat"><div class="v">'+totalLikes+'</div><div class="l">Лайков</div></div>'
-        +'<div class="stat"><div class="v">'+followerCount(userId)+'</div><div class="l">Подписчики</div></div>'
-        +'<div class="stat"><div class="v">'+followingCount(userId)+'</div><div class="l">Подписки</div></div>'
-      +'</div>'
-    +'</div>'
-    +'<div class="sec-title">Шортсы</div>'
-    +(shorts.length?shorts.map(shortCardHTML).join(''):'<div class="empty"><p>Нет шортсов</p></div>');
-}
+function render(){
+  app.innerHTML = "";
 
-// ══════════════════════════════════════
-// ПОЛЬЗОВАТЕЛЬСКИЙ РЕЖИМ
-// ══════════════════════════════════════
-var modalUID=null;
-function openUserModal(userId){
-  if(userId===me.id){goPage('profile');return;}
-  modalUID=userId;
-  renderProfile(userId,'modal-out');
-  document.getElementById('modal-bg').classList.add('open');
-}
-function closeModal(){
-  document.getElementById('modal-bg').classList.remove('open');
-  modalUID=null;
-}
+  let list = getFiltered();
 
-// ══════════════════════════════════════
-// ЗРИТЕЛЬ
-// ══════════════════════════════════════
-function viewerIsOpen(){return document.getElementById('viewer').classList.contains('open');}
+  list.forEach((p,i)=>{
+    let div = document.createElement("div");
+    div.className = "post" + (i===index ? " active":"");
 
-function openViewerBySid(shortId){
-  var all=getShorts();
-  var idx = all.findIndex(function(s) { return s.id === shortId; });
-  if(idx===-1)return;
-  viewerList=all;
-  viewerIdx=idx;
-  buildSlides();
-  goSlide(viewerIdx,false);
-  document.getElementById('viewer').classList.add('open');
-  document.body.style.overflow='hidden';
-}
+    div.innerHTML = `
+      <video autoplay muted loop>
+        <source src="${p.video}">
+      </video>
+      <div class="overlay"></div>
 
-function closeViewer(){
-  document.querySelectorAll('.viewer-slide video').forEach(function(v){try{v.pause();}catch(e){}});
-  document.getElementById('viewer').classList.remove('open');
-  document.body.style.overflow='';
-}
+      <div class="info">
+        <div class="user">${p.user}</div>
+        <div class="title">${p.title}</div>
+        <div class="stats">❤️ ${p.likes} | 👁 ${p.views} | 👥 ${p.followers}</div>
+      </div>
+    `;
 
-function buildSlides(){
-  var stack=document.getElementById('viewer-stack');
-  stack.innerHTML='';
-  viewerList.forEach(function(s,i){
-    var slide=document.createElement('div');
-    slide.className='viewer-slide';
-    slide.id='vslide-'+i;
-
-    var media='';
-    if(s.video){
-      media='<video id="vvid-'+i+'" preload="auto" loop playsinline style="width:100%;height:100%;object-fit:contain"><source src="'+s.video+'"></video>';
-    }еще{
-      media='<div class="vs-grad-bg '+gc(s.id)+'">'+esc(s.title)+'</div>';
-    }
-
-    slide.innerHTML=
-      СМИ
-      +'<div class="v-top-fade"></div>'
-      +'<div class="v-bot-fade"></div>'
-      +'<div class="v-info">'
-        +'<div class="v-author-row" data-open-uid="'+esc(s.authorId)+'">'
-          +'<div class="av-sm">'+initials(s.authorName)+'</div>'
-          +'<div><div class="v-author-name">'+esc(s.authorName)+'</div><div class="v-author-handle">@'+esc(s.authorNick)+'</div></div>'
-        +'</div>'
-        +'<div class="v-title-text">'+esc(s.title)+'</div>'
-        +(s.desc?'<div class="v-desc-text">'+esc(s.desc)+'</div>':'')
-      +'</div>'
-      +'<div class="viewer-actions" id="vacts-'+i+'"></div>';
-
-    stack.appendChild(slide);
+    app.appendChild(div);
   });
+
+  playVideo();
+  addView(list);
+  save();
 }
 
-function renderViewerActions(){
-  var s=viewerList[viewerIdx];
-  if(!s)return;
-  var el=document.getElementById('vacts-'+viewerIdx);
-  if(!el)return;
-  var liked=s.likes.indexOf(me.id)!==-1;
-  var cmtCount = getComments().filter(function(c) { return c.shortId === s.id; }).length;
-  var isOwner=s.authorId===me.id;
-  el.innerHTML=
-    '<button class="vact'+(liked?' liked':'')+'" data-vlike="'+esc(s.id)+'">'
-      +'<div class="vact-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="'+(liked?'var(--like)':'none')+'" stroke="'+(liked?'var(--like)':'white')+'" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>'
-      +'<span class="vact-label" style="color:'+(liked?'var(--like)':'#fff')+'">'+s.likes.length+'</span>'
-    +'</button>'
-    +'<button class="vact" data-vcomment="1">'
-      +'<div class="vact-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>'
-      +'<span class="vact-label">'+cmtCount+'</span>'
-    +'</button>'
-    +(isOwner
-      ?'<button class="vact" data-vdel="'+esc(s.id)+'">'
-          +'<div class="vact-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>'
-          +'<span class="vact-label">Удалить</span>'
-        +'</button>'
-      :'');
+/* ===== VIDEO ===== */
+function playVideo(){
+  document.querySelectorAll("video").forEach(v=>v.pause());
+  let v = document.querySelector(".post.active video");
+  if(v) v.play();
 }
 
-function goSlide(newIdx, animate){
-  if(newIdx<0||newIdx>=viewerList.length)return;
-  // приостановить текущий
-  var cv=document.getElementById('vvid-'+viewerIdx);
-  if(cv)cv.pause();
-  viewerIdx=newIdx;
-  // переместить слайды
-  viewerList.forEach(function(s,i){
-    var sl=document.getElementById('vslide-'+i);
-    if(!sl)return;
-    sl.style.transition=animate===false?'none':'transform .35s cubic-bezier(.4,0,.2,1)';
-    sl.style.transform='translateY('+((i-newIdx)*100)+'%)';
+/* ===== NAV ===== */
+function next(){
+  index++;
+  if(index>=posts.length) index=0;
+  render();
+}
+
+function prev(){
+  index--;
+  if(index<0) index=posts.length-1;
+  render();
+}
+
+/* ===== LIKE ===== */
+function like(){
+  posts[index].likes++;
+  spawnHeart();
+  save();
+  render();
+}
+
+function spawnHeart(){
+  let h=document.createElement("div");
+  h.className="heart";
+  h.innerText="❤️";
+  h.style.left=Math.random()*80+"%";
+  h.style.top="60%";
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),1000);
+}
+
+/* ===== FOLLOW ===== */
+function follow(){
+  posts[index].followers++;
+  alert("➕ подписка добавлена");
+  save();
+  render();
+}
+
+/* ===== BOOKMARK ===== */
+function bookmark(){
+  posts[index].bookmarked = !posts[index].bookmarked;
+  alert(posts[index].bookmarked ? "🔖 сохранено" : "❌ убрано");
+  save();
+  render();
+}
+
+/* ===== VIEWS ===== */
+function addView(list){
+  let p = list[index];
+  if(p) p.views++;
+}
+
+/* ===== UPLOAD VIDEO (OFFLINE) ===== */
+function uploadVideo(e){
+  let file = e.target.files[0];
+  if(!file) return;
+
+  let url = URL.createObjectURL(file);
+
+  posts.unshift({
+    user:"@you",
+    title:file.name,
+    video:url,
+    likes:0,
+    views:0,
+    followers:0,
+    bookmarked:false
   });
-  if(animate===false){
-    document.getElementById('viewer-stack').offsetHeight;
-    viewerList.forEach(function(s,i){var sl=document.getElementById('vslide-'+i);if(sl)sl.style.transition='';});
-  }
-  setTimeout(function(){var nv=document.getElementById('vvid-'+newIdx);if(nv)nv.play().catch(function(){});},360);
-  renderViewerActions();
-  loadComments(viewerList[newIdx].id);
-  // обновить навигацию
-  document.getElementById('viewer-counter').textContent=(newIdx+1)+' / '+viewerList.length;
-  document.getElementById('btn-vnav-up').disabled=(newIdx===0);
-  document.getElementById('btn-vnav-down').disabled=(newIdx===viewerList.length-1);
+
+  index = 0;
+  save();
+  render();
 }
 
-// ── Комментарии ─────────────────────────
-function loadComments(shortId){
-  var list = getComments().filter(function(c) { return c.shortId === shortId; });
-  document.getElementById('cp-count').textContent=list.length?'('+list.length+')':'';
-  var el=document.getElementById('cp-list');
-  if(!list.length){el.innerHTML='<div class="cp-empty">Комментариев пока нет.<br>Будь первым!</div>';return;}
-  el.innerHTML=list.map(function(c){
-    return '<div class="comment-item">'
-      +'<div class="av-sm">'+initials(c.authorName)+'</div>'
-      +'<div class="comment-body">'
-        +'<span class="comment-author">'+esc(c.authorName)+'</span> '
-        +'<span class="comment-handle">@'+esc(c.authorNick)+'</span>'
-        +'<div class="comment-text">'+esc(c.text)+'</div>'
-        +'<div class="comment-time">'+ago(c.createdAt)+'</div>'
-      +'</div>'
-    +'</div>';
-  }).присоединиться('');
-  el.scrollTop=el.scrollHeight;
-}
-function doSendComment(){
-  if(!viewerList.length)return;
-  var input=document.getElementById('cp-input');
-  var text=input.value.trim();
-  if(!text)return;
-  var s=viewerList[viewerIdx];
-  var cmt=getComments();
-  cmt.push({id:uid(),shortId:s.id,authorId:me.id,authorName:me.name,authorNick:me.nick,text:text,createdAt:Date.now()});
-  saveComments(cmt);
-  input.value='';
-  loadComments(s.id);
-  renderViewerActions();
-  renderFeed();
-}
+/* ===== SWIPE ===== */
+let startY=0;
 
-// ── Касание/проведение пальцем ─────────────────────────
-var tStartY=0,tDiff=0;
-var stack=document.getElementById('viewer-stack');
-stack.addEventListener('touchstart',function(e){tStartY=e.touches[0].clientY;},{passive:true});
-stack.addEventListener('touchmove', function(e){tDiff=e.touches[0].clientY-tStartY;},{passive:true});
-stack.addEventListener('touchend', function(){if(Math.abs(tDiff)>55){goSlide(tDiff<0?viewerIdx+1:viewerIdx-1,true);}tDiff=0;});
-
-// ── Колесо мыши ─────────────────────────
-var wCool=false;
-stack.addEventListener('wheel',function(e){
-  e.preventDefault();
-  if(wCool)return;
-  wCool=true; setTimeout(function(){wCool=false;},500);
-  goSlide(e.deltaY>0?viewerIdx+1:viewerIdx-1,true);
-},{passive:false});
-
-// ══════════════════════════════════════
-// ГЛОБАЛЬНЫЙ ОБРАБОТЧИК КЛИКА (единое делегирование)
-// ══════════════════════════════════════
-document.addEventListener('click',function(e){
-  var t=e.target;
-
-  // ── Кнопки авторизации ───────────────────────
-  if(t.id==='tab-login'){ switchTab('login'); return; }
-  if(t.id==='tab-reg') { switchTab('reg'); return; }
-  if(t.id==='btn-login'){ doLogin(); возвращаться; }
-  if(t.id==='btn-reg') { doRegister(); return; }
-
-  // ── Выход ─────────────────────────────
-  if(t.closest('#btn-logout')){ doLogout(); return; }
-
-  // ── Боковая панель навигации ────────────────────────
-  var nb=t.closest('.nav-btn[data-page]');
-  if(nb){ goPage(nb.dataset.page); return; }
-
-  // ── Загрузка ────────────────────────────
-  if(t.id==='btn-publish') { doPublish(); return; }
-  if(t.id==='btn-remove-vid') { clearVideo(); return; }
-
-  // ── Вкладки поиска ────────────────────────
-  if(t.id==='stab-users'){
-    searchTab='users';
-    document.getElementById('stab-users').classList.add('active');
-    document.getElementById('stab-shorts').classList.remove('active');
-    renderSearch(); return;
-  }
-  if(t.id==='stab-shorts'){
-    searchTab='shorts';
-    document.getElementById('stab-shorts').classList.add('active');
-    document.getElementById('stab-users').classList.remove('active');
-    renderSearch(); return;
-  }
-
-  // ── Открыть программу просмотра по короткому ID ───────────
-  // data-open-sid включен: миниатюра карточки, текст заголовка, счетчик комментариев
-  var osEl=t.closest('[data-open-sid]');
-  if(osEl && !t.closest('[data-open-uid]') && !t.closest('[data-like-sid]') && !t.closest('[data-del-sid]')){
-    openViewerBySid(osEl.dataset.openSid); return;
-  }
-
-  // ── Лайк из ленты ────────────────────
-  var lkEl=t.closest('[data-like-sid]');
-  if(lkEl){ toggleLike(lkEl.dataset.likeSid); return; }
-
-  // ── Удалить из ленты ──────────────────
-  var dlEl=t.closest('[data-del-sid]');
-  если (dlEl) { doDeleteShort (dlEl.dataset.delSid); возвращаться; }
-
-  // ── Открыть профиль пользователя (из заголовка или строки поиска) ──
-  var uEl=t.closest('[data-open-uid]');
-  if(uEl){ openUserModal(uEl.dataset.openUid); return; }
-
-  // ── Подписаться / Отписаться ──────────────────
-  var fEl=t.closest('[data-do-follow]');
-  если(fEl){
-    doFollow(fEl.dataset.doFollow);
-    // Обновить контекст, содержащий кнопку
-    если (modalUID) openUserModal (modalUID);
-    else if(profileUID) renderProfile(profileUID,'profile-out');
-    возвращаться;
-  }
-  var ufEl=t.closest('[data-do-unfollow]');
-  if(ufEl){
-    doFollow(ufEl.dataset.doUnfollow);
-    если (modalUID) openUserModal (modalUID);
-    else if(profileUID) renderProfile(profileUID,'profile-out');
-    возвращаться;
-  }
-
-  // ── ЗРИТЕЛЬ: нравится ───────────────────────
-  var vlEl=t.closest('[data-vlike]');
-  if(vlEl){ toggleLike(vlEl.dataset.vlike); возвращаться; }
-
-  // ── ЗРИТЕЛЬ: удалить ─────────────────────
-  var vdEl=t.closest('[data-vdel]');
-  if(vdEl){ doDeleteShort(vdEl.dataset.vdel); return; }
-
-  // ── ЗРИТЕЛЬ: фокусировка на комментариях ─────────────
-  var vcEl=t.closest('[data-vcomment]');
-  if(vcEl){ document.getElementById('cp-input').focus(); return; }
-
-  // ── ЗРИТЕЛЬ: навигация ────────────────────────
-  if(t.closest('#btn-vnav-up')) { goSlide(viewerIdx-1,true); return; }
-  if(t.closest('#btn-vnav-down')) { goSlide(viewerIdx+1,true); return; }
-  if(t.closest('#btn-viewer-close')){ closeViewer(); return; }
-
-  // ── ЗРИТЕЛЬ: клик на автора ───────────────
-  var vaEl=t.closest('.v-author-row[data-open-uid]');
-  if(vaEl){ openUserModal(vaEl.dataset.openUid); return; }
-
-  // ── Отправить комментарий ───────────────────────
-  if(t.closest('#btn-cp-send')){ doSendComment(); return; }
-
-  // ── Закрытие модального окна ────────────────────────
-  if(t.id==='modal-bg' || t.closest('#btn-modal-close')){ closeModal(); return; }
+document.addEventListener("touchstart",e=>{
+  startY=e.touches[0].clientY;
 });
 
-// ── Комментарий, отправленный через Enter ─────────────
-document.getElementById('cp-input').addEventListener('keydown',function(e){
-  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSendComment();}
+document.addEventListener("touchend",e=>{
+  let endY=e.changedTouches[0].clientY;
+
+  if(startY-endY>50) next();
+  if(endY-startY>50) prev();
 });
 
-// ── Поиск в реальном времени ───────────────────────
-document.getElementById('search-q').addEventListener('input',function(){if(me)renderSearch();});
-
-// ── Сочетания клавиш ────────────────
-document.addEventListener('keydown',function(e){
-  if(e.key==='Escape'){
-    if(viewerIsOpen()){closeViewer();}
-    else{closeModal();}
-    возвращаться;
-  }
-  if(viewerIsOpen()){
-    if(e.key==='ArrowDown'||e.key==='ArrowRight') goSlide(viewerIdx+1,true);
-    if(e.key==='ArrowUp' ||e.key==='ArrowLeft') goSlide(viewerIdx-1,true);
-    возвращаться;
-  }
-  if(e.key==='Enter'&&!me){
-    if(document.getElementById('form-login').style.display!=='none') doLogin();
-    иначе doRegister();
-  }
+/* ===== WHEEL ===== */
+document.addEventListener("wheel",e=>{
+  if(e.deltaY>0) next();
+  else prev();
 });
 
-// ══════════════════════════════════════
-// БУТСТРАП
-// ══════════════════════════════════════
-(function(){
-  var sid=load(SESK,null);
-  если(sid){
-    var user = getUsers().find(function(u) { return u.id === sid; });
-    if(user){startApp(user);return;}
-  }
-  document.getElementById('auth-screen').style.display='flex';
-})();
+/* ===== KEYBOARD (MAX feature) ===== */
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowDown") next();
+  if(e.key==="ArrowUp") prev();
+  if(e.key===" "){ like(); }
+});
+
+/* ===== INIT ===== */
+render();
 </script>
+
 </body>
 </html>
