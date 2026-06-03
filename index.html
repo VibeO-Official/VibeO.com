@@ -3,340 +3,189 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>VibeO MAX ULTRA</title>
+<title>VibeO</title>
 
 <style>
-body{
-  margin:0;
-  background:black;
-  color:white;
-  overflow:hidden;
-  font-family:Arial;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #fafafa;
 }
 
-#app{
-  height:100vh;
-  width:100vw;
-  position:relative;
+/* TOP BAR */
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 50px;
+  background: white;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
 }
 
-/* ===== POST ===== */
-.post{
-  height:100vh;
-  width:100vw;
-  display:none;
-  position:absolute;
-  top:0; left:0;
+/* STORIES */
+.stories {
+  margin-top: 60px;
+  display: flex;
+  overflow-x: auto;
+  padding: 10px;
+  background: white;
+  border-bottom: 1px solid #ddd;
 }
 
-.post.active{display:block;}
-
-video{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  position:absolute;
-  top:0; left:0;
-  z-index:-2;
+.story {
+  min-width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid #ff4d6d;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  background: #eee;
 }
 
-.overlay{
-  position:absolute;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.35);
-  z-index:-1;
+/* POSTS */
+.feed {
+  padding: 10px;
 }
 
-/* ===== UI ===== */
-.info{
-  position:absolute;
-  bottom:120px;
-  left:15px;
+.post {
+  background: white;
+  border: 1px solid #ddd;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
-.user{
-  font-size:14px;
-  opacity:0.9;
+.post-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  font-weight: bold;
 }
 
-.title{
-  font-size:24px;
-  font-weight:bold;
+.post-img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  background: #ccc;
 }
 
-.stats{
-  font-size:12px;
-  opacity:0.7;
-  margin-top:5px;
+.post-actions {
+  padding: 10px;
 }
 
-/* right panel */
-.right{
-  position:absolute;
-  right:15px;
-  bottom:120px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
+.like-btn {
+  cursor: pointer;
+  font-size: 18px;
 }
 
-.btn{
-  width:52px;
-  height:52px;
-  border-radius:50%;
-  border:none;
-  cursor:pointer;
-  background:rgba(255,255,255,0.15);
-  color:white;
-  font-size:18px;
+.likes {
+  margin-top: 5px;
+  font-size: 14px;
 }
 
-/* top bar */
-.top{
-  position:absolute;
-  top:10px;
-  left:10px;
-  right:10px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+/* ADD POST */
+.add-box {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: white;
+  border-top: 1px solid #ddd;
+  padding: 10px;
+  display: flex;
+  gap: 5px;
 }
 
-input{
-  width:55%;
-  padding:8px;
-  border-radius:8px;
-  border:none;
+.add-box input {
+  flex: 1;
+  padding: 8px;
 }
 
-/* upload */
-.upload{
-  position:absolute;
-  bottom:20px;
-  left:15px;
-  background:white;
-  color:black;
-  padding:10px;
-  border-radius:10px;
-  cursor:pointer;
-}
-
-/* heart animation */
-.heart{
-  position:absolute;
-  font-size:30px;
-  animation:float 1s forwards;
-}
-
-@keyframes float{
-  0%{transform:translateY(0);opacity:1;}
-  100%{transform:translateY(-150px);opacity:0;}
+.add-box button {
+  padding: 8px 12px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="app"></div>
+<div class="header">VibeO</div>
 
-<div class="top">
-  <div>🔥 VibeO MAX</div>
-  <input id="search" placeholder="поиск..." oninput="render()"/>
-</div>
+<div class="stories" id="stories"></div>
 
-<div class="right">
-  <button class="btn" onclick="like()">❤️</button>
-  <button class="btn" onclick="follow()">➕</button>
-  <button class="btn" onclick="bookmark()">🔖</button>
-</div>
+<div class="feed" id="feed"></div>
 
-<div class="upload">
-  <input type="file" accept="video/*" onchange="uploadVideo(event)">
+<div class="add-box">
+  <input id="imgUrl" placeholder="URL картинки..." />
+  <button onclick="addPost()">Post</button>
 </div>
 
 <script>
-/* ===== DATA ===== */
-let posts = JSON.parse(localStorage.getItem("vibeo_max") || "null") || [
-  {
-    user:"@neo",
-    title:"Welcome to VibeO",
-    video:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-    likes:0,
-    views:0,
-    followers:0,
-    bookmarked:false
-  },
-  {
-    user:"@alpha",
-    title:"Level MAX",
-    video:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-    likes:0,
-    views:0,
-    followers:0,
-    bookmarked:false
-  }
+let posts = JSON.parse(localStorage.getItem("vibeo_posts")) || [
+  {user:"Alex", img:"https://picsum.photos/400/300?1", likes:0},
+  {user:"Mira", img:"https://picsum.photos/400/300?2", likes:0}
 ];
 
-let index = 0;
+let stories = ["You","Anna","John","Max","Lina"];
 
-/* ===== SAVE ===== */
 function save(){
-  localStorage.setItem("vibeo_max", JSON.stringify(posts));
+  localStorage.setItem("vibeo_posts", JSON.stringify(posts));
 }
 
-/* ===== SEARCH FILTER ===== */
-function getFiltered(){
-  let q = document.getElementById("search").value.toLowerCase();
-  return posts.filter(p =>
-    p.title.toLowerCase().includes(q) ||
-    p.user.toLowerCase().includes(q)
-  );
+function renderStories(){
+  const el = document.getElementById("stories");
+  el.innerHTML = "";
+  stories.forEach(s=>{
+    el.innerHTML += `<div class="story">${s}</div>`;
+  });
 }
-
-/* ===== RENDER ===== */
-const app = document.getElementById("app");
 
 function render(){
-  app.innerHTML = "";
+  const feed = document.getElementById("feed");
+  feed.innerHTML = "";
 
-  let list = getFiltered();
-
-  list.forEach((p,i)=>{
-    let div = document.createElement("div");
-    div.className = "post" + (i===index ? " active":"");
-
-    div.innerHTML = `
-      <video autoplay muted loop>
-        <source src="${p.video}">
-      </video>
-      <div class="overlay"></div>
-
-      <div class="info">
-        <div class="user">${p.user}</div>
-        <div class="title">${p.title}</div>
-        <div class="stats">❤️ ${p.likes} | 👁 ${p.views} | 👥 ${p.followers}</div>
+  posts.forEach((p,i)=>{
+    feed.innerHTML += `
+      <div class="post">
+        <div class="post-header">${p.user}</div>
+        <img class="post-img" src="${p.img}">
+        <div class="post-actions">
+          <span class="like-btn" onclick="like(${i})">❤️</span>
+          <div class="likes">${p.likes} likes</div>
+        </div>
       </div>
     `;
-
-    app.appendChild(div);
   });
-
-  playVideo();
-  addView(list);
-  save();
 }
 
-/* ===== VIDEO ===== */
-function playVideo(){
-  document.querySelectorAll("video").forEach(v=>v.pause());
-  let v = document.querySelector(".post.active video");
-  if(v) v.play();
-}
-
-/* ===== NAV ===== */
-function next(){
-  index++;
-  if(index>=posts.length) index=0;
-  render();
-}
-
-function prev(){
-  index--;
-  if(index<0) index=posts.length-1;
-  render();
-}
-
-/* ===== LIKE ===== */
-function like(){
-  posts[index].likes++;
-  spawnHeart();
+function like(i){
+  posts[i].likes++;
   save();
   render();
 }
 
-function spawnHeart(){
-  let h=document.createElement("div");
-  h.className="heart";
-  h.innerText="❤️";
-  h.style.left=Math.random()*80+"%";
-  h.style.top="60%";
-  document.body.appendChild(h);
-  setTimeout(()=>h.remove(),1000);
-}
-
-/* ===== FOLLOW ===== */
-function follow(){
-  posts[index].followers++;
-  alert("➕ подписка добавлена");
-  save();
-  render();
-}
-
-/* ===== BOOKMARK ===== */
-function bookmark(){
-  posts[index].bookmarked = !posts[index].bookmarked;
-  alert(posts[index].bookmarked ? "🔖 сохранено" : "❌ убрано");
-  save();
-  render();
-}
-
-/* ===== VIEWS ===== */
-function addView(list){
-  let p = list[index];
-  if(p) p.views++;
-}
-
-/* ===== UPLOAD VIDEO (OFFLINE) ===== */
-function uploadVideo(e){
-  let file = e.target.files[0];
-  if(!file) return;
-
-  let url = URL.createObjectURL(file);
+function addPost(){
+  const url = document.getElementById("imgUrl").value;
+  if(!url) return;
 
   posts.unshift({
-    user:"@you",
-    title:file.name,
-    video:url,
-    likes:0,
-    views:0,
-    followers:0,
-    bookmarked:false
+    user:"You",
+    img:url,
+    likes:0
   });
 
-  index = 0;
+  document.getElementById("imgUrl").value = "";
   save();
   render();
 }
 
-/* ===== SWIPE ===== */
-let startY=0;
-
-document.addEventListener("touchstart",e=>{
-  startY=e.touches[0].clientY;
-});
-
-document.addEventListener("touchend",e=>{
-  let endY=e.changedTouches[0].clientY;
-
-  if(startY-endY>50) next();
-  if(endY-startY>50) prev();
-});
-
-/* ===== WHEEL ===== */
-document.addEventListener("wheel",e=>{
-  if(e.deltaY>0) next();
-  else prev();
-});
-
-/* ===== KEYBOARD (MAX feature) ===== */
-document.addEventListener("keydown",e=>{
-  if(e.key==="ArrowDown") next();
-  if(e.key==="ArrowUp") prev();
-  if(e.key===" "){ like(); }
-});
-
-/* ===== INIT ===== */
+renderStories();
 render();
 </script>
 
