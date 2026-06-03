@@ -1,301 +1,740 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram clone — VibeO</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VibeO</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+  :root {
+    --bg: #0a0a0a;
+    --bg2: #111111;
+    --bg3: #1a1a1a;
+    --bg4: #222222;
+    --border: #2a2a2a;
+    --text: #f0f0f0;
+    --text2: #999999;
+    --text3: #666666;
+    --accent: #7c3aed;
+    --accent2: #9f5ff0;
+    --accent-glow: rgba(124,58,237,0.25);
+    --danger: #ef4444;
+    --success: #22c55e;
+    --like: #f43f5e;
+    --radius: 12px;
+    --sidebar: 240px;
+    --transition: 0.18s ease;
+  }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #000;
-            color: #fff;
-            overflow-x: hidden;
-        }
+  html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
 
-        .main-container {
-            display: flex;
-            max-width: 1250px;
-            margin: 0 auto;
-            min-height: 100vh;
-        }
+  /* ─── AUTH ─────────────────────────────────────── */
+  #auth-screen {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh;
+    background: radial-gradient(ellipse at 30% 20%, rgba(124,58,237,0.18) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(124,58,237,0.12) 0%, transparent 50%), var(--bg);
+  }
+  .auth-box {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 20px;
+    padding: 40px 36px; width: 380px; max-width: 95vw;
+    box-shadow: 0 0 60px rgba(124,58,237,0.15);
+  }
+  .auth-logo { text-align: center; margin-bottom: 28px; }
+  .auth-logo h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px;
+    background: linear-gradient(135deg, #9f5ff0, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .auth-logo p { color: var(--text2); font-size: 13px; margin-top: 4px; }
+  .auth-tabs { display: flex; gap: 4px; background: var(--bg3); border-radius: var(--radius); padding: 4px; margin-bottom: 24px; }
+  .auth-tab { flex: 1; padding: 9px; text-align: center; border-radius: 9px; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text2); transition: var(--transition); border: none; background: none; }
+  .auth-tab.active { background: var(--accent); color: #fff; box-shadow: 0 2px 12px var(--accent-glow); }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-group input { width: 100%; padding: 12px 14px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 14px; transition: var(--transition); outline: none; }
+  .form-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+  .btn { width: 100%; padding: 13px; background: var(--accent); border: none; border-radius: var(--radius); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; transition: var(--transition); margin-top: 6px; }
+  .btn:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow); }
+  .btn:active { transform: translateY(0); }
+  .auth-error { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: var(--danger); border-radius: var(--radius); padding: 10px 14px; font-size: 13px; margin-bottom: 12px; display: none; }
 
-        .sidebar {
-            width: 245px;
-            padding: 25px 12px;
-            border-right: 1px solid #262626;
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            height: 100vh;
-        }
+  /* ─── APP LAYOUT ───────────────────────────────── */
+  #app { display: flex; min-height: 100vh; display: none; }
 
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            font-style: italic;
-            font-family: 'Courier New', Courier, monospace;
-            margin-bottom: 35px;
-            padding-left: 12px;
-            background: linear-gradient(
-                45deg,
-                #f09433 0%,
-                #e6683c 25%,
-                #dc2743 50%,
-                #cc2366 75%,
-                #bc1888 100%
-            );
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+  /* ─── SIDEBAR ──────────────────────────────────── */
+  .sidebar {
+    width: var(--sidebar); position: fixed; left: 0; top: 0; bottom: 0;
+    background: var(--bg2); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; z-index: 100; transition: width var(--transition);
+  }
+  .sidebar-logo { padding: 24px 20px 20px; }
+  .sidebar-logo span { font-size: 24px; font-weight: 800; letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #9f5ff0, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .sidebar-nav { flex: 1; padding: 8px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 14px; padding: 13px 14px; border-radius: var(--radius); cursor: pointer; color: var(--text2); font-size: 15px; font-weight: 500; transition: var(--transition); border: none; background: none; width: 100%; text-align: left; }
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+  .nav-item.active { background: var(--bg3); color: var(--text); }
+  .nav-item .nav-icon { width: 24px; height: 24px; flex-shrink: 0; }
+  .sidebar-bottom { padding: 12px; border-top: 1px solid var(--border); }
+  .user-chip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--radius); cursor: pointer; transition: var(--transition); }
+  .user-chip:hover { background: var(--bg3); }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #c084fc); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #fff; flex-shrink: 0; }
+  .avatar.lg { width: 80px; height: 80px; font-size: 28px; }
+  .user-info { flex: 1; min-width: 0; }
+  .user-info .name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .user-info .handle { font-size: 12px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .logout-btn { background: none; border: none; cursor: pointer; color: var(--text3); padding: 4px; border-radius: 8px; transition: var(--transition); }
+  .logout-btn:hover { color: var(--danger); background: rgba(239,68,68,0.1); }
 
-        .nav-menu {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            flex-grow: 1;
-        }
+  /* ─── MAIN CONTENT ─────────────────────────────── */
+  .main { margin-left: var(--sidebar); flex: 1; min-height: 100vh; }
+  .page { display: none; padding: 24px; max-width: 760px; margin: 0 auto; }
+  .page.active { display: block; }
+  .page-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
 
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 12px;
-            font-size: 16px;
-            font-weight: 500;
-            border-radius: 8px;
-            cursor: pointer;
-            color: #f5f5f5;
-            text-decoration: none;
-            transition: background 0.2s;
-        }
+  /* ─── PUBLISH CARD ─────────────────────────────── */
+  .publish-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 24px; }
+  .publish-card .card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .publish-input { width: 100%; padding: 11px 14px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 14px; outline: none; transition: var(--transition); resize: none; font-family: inherit; }
+  .publish-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+  .publish-input::placeholder { color: var(--text3); }
+  .publish-actions { display: flex; justify-content: flex-end; margin-top: 12px; }
+  .btn-sm { padding: 9px 20px; background: var(--accent); border: none; border-radius: 9px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition); }
+  .btn-sm:hover { background: var(--accent2); transform: translateY(-1px); }
 
-        .nav-item:hover,
-        .nav-item.active {
-            background-color: #1a1a1a;
-            color: #fff;
-            font-weight: 700;
-        }
+  /* ─── SHORT CARD ───────────────────────────────── */
+  .short-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 16px; transition: var(--transition); }
+  .short-card:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow); }
+  .short-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; cursor: pointer; }
+  .short-meta { flex: 1; }
+  .short-meta .author { font-size: 14px; font-weight: 600; }
+  .short-meta .time { font-size: 12px; color: var(--text3); }
+  .short-thumb { background: linear-gradient(135deg, var(--bg3), var(--bg4)); border-radius: 12px; aspect-ratio: 16/9; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 14px; position: relative; overflow: hidden; }
+  .short-thumb-bg { position: absolute; inset: 0; opacity: 0.08; }
+  .play-icon { width: 52px; height: 52px; background: rgba(255,255,255,0.12); backdrop-filter: blur(8px); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1; transition: var(--transition); }
+  .short-thumb:hover .play-icon { background: rgba(124,58,237,0.4); transform: scale(1.08); }
+  .short-thumb .vid-title { color: #fff; font-size: 15px; font-weight: 700; margin-top: 10px; text-align: center; z-index: 1; padding: 0 20px; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
+  .short-body { }
+  .short-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .short-desc { font-size: 14px; color: var(--text2); line-height: 1.5; margin-bottom: 14px; }
+  .short-foot { display: flex; align-items: center; gap: 16px; }
+  .like-btn { display: flex; align-items: center; gap: 6px; background: none; border: 1px solid var(--border); border-radius: 8px; padding: 7px 14px; color: var(--text2); cursor: pointer; font-size: 14px; font-weight: 500; transition: var(--transition); }
+  .like-btn:hover, .like-btn.liked { border-color: var(--like); color: var(--like); background: rgba(244,63,94,0.08); }
+  .like-btn.liked svg { fill: var(--like); }
+  .short-ts { font-size: 12px; color: var(--text3); }
+  .short-delete { margin-left: auto; background: none; border: none; cursor: pointer; color: var(--text3); border-radius: 8px; padding: 6px; transition: var(--transition); }
+  .short-delete:hover { color: var(--danger); background: rgba(239,68,68,0.1); }
 
-        .nav-item .icon {
-            font-size: 22px;
-            width: 24px;
-            text-align: center;
-        }
+  /* ─── SEARCH ───────────────────────────────────── */
+  .search-wrap { position: relative; margin-bottom: 20px; }
+  .search-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text3); }
+  .search-input { width: 100%; padding: 12px 14px 12px 42px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 14px; outline: none; transition: var(--transition); }
+  .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+  .search-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .search-tab { padding: 8px 18px; border-radius: 20px; border: 1px solid var(--border); background: none; color: var(--text2); font-size: 13px; font-weight: 500; cursor: pointer; transition: var(--transition); }
+  .search-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .user-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; cursor: pointer; transition: var(--transition); }
+  .user-row:hover { border-color: var(--accent); }
+  .user-row .info .name { font-size: 14px; font-weight: 600; }
+  .user-row .info .handle { font-size: 12px; color: var(--text2); }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
+  .empty-state svg { margin-bottom: 12px; opacity: 0.4; }
+  .empty-state p { font-size: 15px; }
 
-        .auth-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
+  /* ─── PROFILE ──────────────────────────────────── */
+  .profile-header { background: var(--bg2); border: 1px solid var(--border); border-radius: 18px; padding: 28px; margin-bottom: 20px; }
+  .profile-top { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px; }
+  .profile-info { flex: 1; }
+  .profile-name { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
+  .profile-handle { font-size: 14px; color: var(--text2); margin-bottom: 10px; }
+  .profile-bio { font-size: 14px; color: var(--text2); line-height: 1.5; }
+  .profile-stats { display: flex; gap: 24px; }
+  .stat { text-align: center; }
+  .stat .val { font-size: 20px; font-weight: 700; }
+  .stat .lbl { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .section-title { font-size: 16px; font-weight: 700; margin-bottom: 14px; }
 
-        .auth-box {
-            background-color: #000;
-            border: 1px solid #262626;
-            padding: 40px;
-            width: 100%;
-            max-width: 350px;
-            text-align: center;
-        }
+  /* ─── MODAL (other user profile) ──────────────── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; width: 500px; max-width: 95vw; max-height: 85vh; overflow-y: auto; padding: 28px; position: relative; }
+  .modal-close { position: absolute; top: 16px; right: 16px; background: var(--bg3); border: none; cursor: pointer; color: var(--text2); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+  .modal-close:hover { background: var(--bg4); color: var(--text); }
 
-        .auth-logo {
-            font-size: 32px;
-            font-weight: bold;
-            font-style: italic;
-            margin-bottom: 24px;
-            font-family: 'Courier New', Courier, monospace;
-        }
+  /* ─── TOAST ────────────────────────────────────── */
+  #toast { position: fixed; bottom: 28px; right: 28px; background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 12px 18px; font-size: 14px; font-weight: 500; z-index: 999; opacity: 0; transform: translateY(10px); transition: all 0.25s ease; pointer-events: none; }
+  #toast.show { opacity: 1; transform: translateY(0); }
+  #toast.success { border-color: var(--success); color: var(--success); }
+  #toast.error { border-color: var(--danger); color: var(--danger); }
 
-        .auth-text {
-            color: #737373;
-            font-weight: 600;
-            font-size: 16px;
-            line-height: 20px;
-            margin-bottom: 20px;
-        }
+  /* ─── GRADIENT BACKGROUNDS FOR THUMBS ─────────── */
+  .grad-0 { background: linear-gradient(135deg, #1a0533 0%, #3b1a6b 100%); }
+  .grad-1 { background: linear-gradient(135deg, #0a1a2e 0%, #0f3460 100%); }
+  .grad-2 { background: linear-gradient(135deg, #1a0a0a 0%, #4a1010 100%); }
+  .grad-3 { background: linear-gradient(135deg, #0a1a0a 0%, #0f3d1e 100%); }
+  .grad-4 { background: linear-gradient(135deg, #1a1500 0%, #3d3400 100%); }
+  .grad-5 { background: linear-gradient(135deg, #1a0a1a 0%, #3d1240 100%); }
 
-        .auth-input {
-            width: 100%;
-            background: #121212;
-            border: 1px solid #363636;
-            border-radius: 3px;
-            padding: 9px 12px;
-            color: #fff;
-            font-size: 12px;
-            margin-bottom: 8px;
-            outline: none;
-        }
+  /* ─── RESPONSIVE ───────────────────────────────── */
+  @media (max-width: 768px) {
+    :root { --sidebar: 64px; }
+    .sidebar-logo { padding: 16px 10px; text-align: center; }
+    .sidebar-logo span { font-size: 18px; }
+    .nav-item span { display: none; }
+    .nav-item { justify-content: center; padding: 13px; }
+    .user-info, .logout-btn { display: none; }
+    .user-chip { justify-content: center; }
+    .page { padding: 16px; }
+  }
+  @media (max-width: 480px) {
+    .profile-stats { gap: 16px; }
+    .short-thumb { aspect-ratio: 4/3; }
+  }
 
-        .auth-input:focus {
-            border-color: #a8a8a8;
-        }
+  /* ─── SCROLLBAR ────────────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
 
-        .auth-btn {
-            width: 100%;
-            background-color: #0095f6;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 16px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 8px;
-            transition: background 0.2s;
-        }
-
-        .auth-btn:hover {
-            background-color: #1877f2;
-        }
-
-        .content-hidden {
-            display: none;
-        }
-
-        .welcome {
-            margin-left: 260px;
-            padding: 40px;
-            font-size: 24px;
-        }
-    </style>
+  /* ─── ANIMATIONS ───────────────────────────────── */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-up { animation: fadeUp 0.3s ease forwards; }
+  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+  .pulse { animation: pulse 0.25s ease; }
+</style>
 </head>
 <body>
 
-    <!-- Экран регистрации -->
-    <div id="authScreen" class="auth-overlay">
-        <div class="auth-box">
-            <div class="auth-logo">VibeO</div>
+<!-- ════════════════════════════════════════════
+     AUTH SCREEN
+════════════════════════════════════════════ -->
+<div id="auth-screen">
+  <div class="auth-box fade-up">
+    <div class="auth-logo">
+      <h1>VibeO</h1>
+      <p>Делись своими моментами</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Войти</button>
+      <button class="auth-tab" onclick="switchTab('register')">Регистрация</button>
+    </div>
+    <div id="auth-error" class="auth-error"></div>
 
-            <p class="auth-text">
-                Зарегистрируйтесь, чтобы смотреть фото и видео ваших друзей.
-            </p>
-
-            <input
-                type="email"
-                id="regEmail"
-                class="auth-input"
-                placeholder="Моб. телефон или эл. адрес"
-            >
-
-            <input
-                type="text"
-                id="regNick"
-                class="auth-input"
-                placeholder="Имя пользователя (Никнейм)"
-            >
-
-            <input
-                type="password"
-                id="regPass"
-                class="auth-input"
-                placeholder="Пароль"
-            >
-
-            <button id="regBtn" class="auth-btn">
-                Зарегистрироваться
-            </button>
-        </div>
+    <!-- Login -->
+    <div id="tab-login">
+      <div class="form-group">
+        <label>Никнейм</label>
+        <input type="text" id="login-nick" placeholder="@yourname" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>Пароль</label>
+        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn" onclick="doLogin()">Войти</button>
     </div>
 
-    <!-- Основной интерфейс -->
-    <div id="appContent" class="content-hidden">
+    <!-- Register -->
+    <div id="tab-register" style="display:none">
+      <div class="form-group">
+        <label>Имя</label>
+        <input type="text" id="reg-name" placeholder="Твоё имя">
+      </div>
+      <div class="form-group">
+        <label>Никнейм</label>
+        <input type="text" id="reg-nick" placeholder="@yourname" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>Пароль</label>
+        <input type="password" id="reg-pass" placeholder="Минимум 4 символа" autocomplete="new-password">
+      </div>
+      <button class="btn" onclick="doRegister()">Создать аккаунт</button>
+    </div>
+  </div>
+</div>
 
-        <div class="main-container">
-
-            <div class="sidebar">
-                <div class="logo">VibeO</div>
-
-                <div class="nav-menu">
-                    <a class="nav-item active">
-                        <span class="icon">🏠</span>
-                        <span>Главная</span>
-                    </a>
-
-                    <a class="nav-item">
-                        <span class="icon">🔍</span>
-                        <span>Поиск</span>
-                    </a>
-                </div>
-            </div>
-
-            <div id="welcomeText" class="welcome">
-                Добро пожаловать!
-            </div>
-
+<!-- ════════════════════════════════════════════
+     APP
+════════════════════════════════════════════ -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo"><span>VibeO</span></div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" onclick="goPage('home')" id="nav-home">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span>Главная</span>
+      </button>
+      <button class="nav-item" onclick="goPage('search')" id="nav-search">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <span>Поиск</span>
+      </button>
+      <button class="nav-item" onclick="goPage('profile')" id="nav-profile">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span>Профиль</span>
+      </button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-chip">
+        <div class="avatar" id="sidebar-avatar"></div>
+        <div class="user-info">
+          <div class="name" id="sidebar-name"></div>
+          <div class="handle" id="sidebar-handle"></div>
         </div>
+        <button class="logout-btn" onclick="doLogout()" title="Выйти">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </aside>
 
+  <!-- MAIN -->
+  <main class="main">
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <div class="page-title">🎬 Лента</div>
+      <!-- Publish -->
+      <div class="publish-card">
+        <div class="card-head">
+          <div class="avatar" id="pub-avatar"></div>
+          <span style="color:var(--text2);font-size:14px;">Поделись чем-нибудь...</span>
+        </div>
+        <input type="text" class="publish-input" id="pub-title" placeholder="Название шортса *">
+        <textarea class="publish-input" id="pub-desc" placeholder="Описание (необязательно)" rows="2" style="margin-top:8px;"></textarea>
+        <div class="publish-actions">
+          <button class="btn-sm" onclick="publishShort()">Опубликовать</button>
+        </div>
+      </div>
+      <!-- Feed -->
+      <div id="feed-list"></div>
     </div>
 
-    <script>
-        function executeRegistration() {
+    <!-- SEARCH -->
+    <div class="page" id="page-search">
+      <div class="page-title">🔍 Поиск</div>
+      <div class="search-wrap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" id="search-q" placeholder="Поиск пользователей или шортсов..." oninput="doSearch()">
+      </div>
+      <div class="search-tabs">
+        <button class="search-tab active" onclick="switchSearch('users')" id="stab-users">Пользователи</button>
+        <button class="search-tab" onclick="switchSearch('shorts')" id="stab-shorts">Шортсы</button>
+      </div>
+      <div id="search-results"></div>
+    </div>
 
-            const email = document
-                .getElementById("regEmail")
-                .value
-                .trim();
+    <!-- PROFILE -->
+    <div class="page" id="page-profile">
+      <div id="profile-content"></div>
+    </div>
+  </main>
+</div>
 
-            const nickname = document
-                .getElementById("regNick")
-                .value
-                .trim();
+<!-- USER MODAL -->
+<div class="modal-overlay" id="user-modal" onclick="closeUserModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div id="modal-content"></div>
+  </div>
+</div>
 
-            const password = document
-                .getElementById("regPass")
-                .value
-                .trim();
+<!-- TOAST -->
+<div id="toast"></div>
 
-            if (!email || !nickname || !password) {
-                alert("Пожалуйста, заполните все поля!");
-                return;
-            }
+<script>
+// ════════════════════════════════════════════
+// DATA LAYER
+// ════════════════════════════════════════════
+const DB = {
+  getUsers: () => JSON.parse(localStorage.getItem('vibeo_users') || '[]'),
+  setUsers: d => localStorage.setItem('vibeo_users', JSON.stringify(d)),
+  getShorts: () => JSON.parse(localStorage.getItem('vibeo_shorts') || '[]'),
+  setShorts: d => localStorage.setItem('vibeo_shorts', JSON.stringify(d)),
+  getSession: () => JSON.parse(localStorage.getItem('vibeo_session') || 'null'),
+  setSession: d => localStorage.setItem('vibeo_session', JSON.stringify(d)),
+  clearSession: () => localStorage.removeItem('vibeo_session'),
+};
 
-            if (!email.includes("@")) {
-                alert("Введите корректный email!");
-                return;
-            }
+let currentUser = null;
+let searchMode = 'users';
 
-            document.getElementById("authScreen").style.display = "none";
+// ════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show ' + type;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.className = ''; }, 2800);
+}
 
-            document
-                .getElementById("appContent")
-                .classList
-                .remove("content-hidden");
+function initials(name) {
+  return (name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+}
 
-            document.getElementById(
-                "welcomeText"
-            ).textContent =
-                `Добро пожаловать, ${nickname}!`;
+function timeAgo(ts) {
+  const diff = Math.floor((Date.now() - ts) / 1000);
+  if (diff < 60) return 'только что';
+  if (diff < 3600) return Math.floor(diff / 60) + ' мин. назад';
+  if (diff < 86400) return Math.floor(diff / 3600) + ' ч. назад';
+  return Math.floor(diff / 86400) + ' дн. назад';
+}
 
-            console.log("Пользователь зарегистрирован:", {
-                email,
-                nickname
-            });
-        }
+function gradClass(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+  return 'grad-' + (h % 6);
+}
 
-        document.addEventListener("DOMContentLoaded", function () {
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
-            const btn = document.getElementById("regBtn");
+// ════════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════════
+function switchTab(tab) {
+  document.getElementById('tab-login').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('tab-register').style.display = tab === 'register' ? '' : 'none';
+  document.querySelectorAll('.auth-tab').forEach((b, i) => {
+    b.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
+  });
+  document.getElementById('auth-error').style.display = 'none';
+}
 
-            btn.addEventListener(
-                "click",
-                executeRegistration
-            );
+function showError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg; el.style.display = '';
+}
 
-        });
-    </script>
+function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const nick = document.getElementById('reg-nick').value.trim().replace(/^@/, '').toLowerCase();
+  const pass = document.getElementById('reg-pass').value;
+  if (!name) return showError('Введи имя');
+  if (!nick || nick.length < 2) return showError('Никнейм минимум 2 символа');
+  if (!/^[a-z0-9_.]+$/.test(nick)) return showError('Никнейм: только латиница, цифры, _ и .');
+  if (pass.length < 4) return showError('Пароль минимум 4 символа');
+  const users = DB.getUsers();
+  if (users.find(u => u.nick === nick)) return showError('Этот никнейм уже занят');
+  const user = { id: Date.now().toString(), name, nick, pass, createdAt: Date.now() };
+  users.push(user);
+  DB.setUsers(users);
+  DB.setSession(user.id);
+  toast('Добро пожаловать, ' + name + '! 🎉', 'success');
+  initApp(user);
+}
 
+function doLogin() {
+  const nick = document.getElementById('login-nick').value.trim().replace(/^@/, '').toLowerCase();
+  const pass = document.getElementById('login-pass').value;
+  if (!nick || !pass) return showError('Заполни все поля');
+  const users = DB.getUsers();
+  const user = users.find(u => u.nick === nick && u.pass === pass);
+  if (!user) return showError('Неверный никнейм или пароль');
+  DB.setSession(user.id);
+  toast('С возвращением, ' + user.name + '!', 'success');
+  initApp(user);
+}
+
+function doLogout() {
+  DB.clearSession();
+  currentUser = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('login-nick').value = '';
+  document.getElementById('login-pass').value = '';
+  switchTab('login');
+}
+
+// ════════════════════════════════════════════
+// APP INIT
+// ════════════════════════════════════════════
+function initApp(user) {
+  currentUser = user;
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  // Sidebar
+  document.getElementById('sidebar-avatar').textContent = initials(user.name);
+  document.getElementById('sidebar-name').textContent = user.name;
+  document.getElementById('sidebar-handle').textContent = '@' + user.nick;
+  document.getElementById('pub-avatar').textContent = initials(user.name);
+  goPage('home');
+}
+
+function goPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('nav-' + page).classList.add('active');
+  if (page === 'home') renderFeed();
+  if (page === 'search') { doSearch(); }
+  if (page === 'profile') renderProfile(currentUser);
+}
+
+// ════════════════════════════════════════════
+// SHORTS / FEED
+// ════════════════════════════════════════════
+function publishShort() {
+  const title = document.getElementById('pub-title').value.trim();
+  const desc = document.getElementById('pub-desc').value.trim();
+  if (!title) { toast('Введи название шортса', 'error'); return; }
+  const shorts = DB.getShorts();
+  const s = {
+    id: Date.now().toString(),
+    authorId: currentUser.id,
+    authorNick: currentUser.nick,
+    authorName: currentUser.name,
+    title, desc,
+    likes: [],
+    createdAt: Date.now()
+  };
+  shorts.unshift(s);
+  DB.setShorts(shorts);
+  document.getElementById('pub-title').value = '';
+  document.getElementById('pub-desc').value = '';
+  toast('Шортс опубликован! 🚀', 'success');
+  renderFeed();
+}
+
+function toggleLike(id) {
+  const shorts = DB.getShorts();
+  const s = shorts.find(x => x.id === id);
+  if (!s) return;
+  const idx = s.likes.indexOf(currentUser.id);
+  if (idx === -1) s.likes.push(currentUser.id);
+  else s.likes.splice(idx, 1);
+  DB.setShorts(shorts);
+  renderFeed();
+  // pulse animation
+  setTimeout(() => {
+    const btn = document.querySelector('[data-like="' + id + '"]');
+    if (btn) { btn.classList.add('pulse'); setTimeout(() => btn.classList.remove('pulse'), 250); }
+  }, 10);
+}
+
+function deleteShort(id) {
+  if (!confirm('Удалить шортс?')) return;
+  const shorts = DB.getShorts().filter(s => s.id !== id);
+  DB.setShorts(shorts);
+  toast('Шортс удалён', '');
+  renderFeed();
+}
+
+function renderShortCard(s, container = 'feed') {
+  const liked = s.likes.includes(currentUser.id);
+  const isOwner = s.authorId === currentUser.id;
+  const grad = gradClass(s.id);
+  return `
+  <div class="short-card fade-up" id="sc-${escHtml(s.id)}">
+    <div class="short-head" onclick="openUserModal('${escHtml(s.authorId)}')">
+      <div class="avatar">${initials(s.authorName)}</div>
+      <div class="short-meta">
+        <div class="author">${escHtml(s.authorName)}</div>
+        <div class="time">@${escHtml(s.authorNick)} · ${timeAgo(s.createdAt)}</div>
+      </div>
+    </div>
+    <div class="short-thumb ${grad}" onclick="void(0)">
+      <div class="play-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </div>
+      <div class="vid-title">${escHtml(s.title)}</div>
+    </div>
+    <div class="short-body">
+      <div class="short-title">${escHtml(s.title)}</div>
+      ${s.desc ? `<div class="short-desc">${escHtml(s.desc)}</div>` : ''}
+      <div class="short-foot">
+        <button class="like-btn ${liked ? 'liked' : ''}" data-like="${escHtml(s.id)}" onclick="toggleLike('${escHtml(s.id)}')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="${liked ? 'var(--like)' : 'none'}" stroke="${liked ? 'var(--like)' : 'currentColor'}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          ${s.likes.length}
+        </button>
+        <span class="short-ts">${new Date(s.createdAt).toLocaleDateString('ru-RU')}</span>
+        ${isOwner ? `<button class="short-delete" onclick="deleteShort('${escHtml(s.id)}')" title="Удалить">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderFeed() {
+  const shorts = DB.getShorts();
+  const el = document.getElementById('feed-list');
+  if (!shorts.length) {
+    el.innerHTML = `<div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M16 3l-4-4-4 4"/></svg>
+      <p>Пока нет шортсов. Будь первым!</p>
+    </div>`;
+    return;
+  }
+  el.innerHTML = shorts.map(s => renderShortCard(s)).join('');
+}
+
+// ════════════════════════════════════════════
+// SEARCH
+// ════════════════════════════════════════════
+function switchSearch(mode) {
+  searchMode = mode;
+  document.getElementById('stab-users').classList.toggle('active', mode === 'users');
+  document.getElementById('stab-shorts').classList.toggle('active', mode === 'shorts');
+  doSearch();
+}
+
+function doSearch() {
+  const q = document.getElementById('search-q').value.trim().toLowerCase();
+  const el = document.getElementById('search-results');
+  if (searchMode === 'users') {
+    const users = DB.getUsers().filter(u => u.id !== currentUser.id);
+    const results = q ? users.filter(u => u.nick.includes(q) || u.name.toLowerCase().includes(q)) : users;
+    if (!results.length) {
+      el.innerHTML = `<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>Пользователи не найдены</p></div>`;
+      return;
+    }
+    el.innerHTML = results.map(u => `
+      <div class="user-row" onclick="openUserModal('${escHtml(u.id)}')">
+        <div class="avatar">${initials(u.name)}</div>
+        <div class="info">
+          <div class="name">${escHtml(u.name)}</div>
+          <div class="handle">@${escHtml(u.nick)}</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    `).join('');
+  } else {
+    const shorts = DB.getShorts();
+    const results = q ? shorts.filter(s => s.title.toLowerCase().includes(q) || s.desc.toLowerCase().includes(q)) : shorts;
+    if (!results.length) {
+      el.innerHTML = `<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M16 3l-4-4-4 4"/></svg><p>Шортсы не найдены</p></div>`;
+      return;
+    }
+    el.innerHTML = results.map(s => renderShortCard(s)).join('');
+  }
+}
+
+// ════════════════════════════════════════════
+// PROFILE
+// ════════════════════════════════════════════
+function renderProfile(user, container = 'profile-content') {
+  const shorts = DB.getShorts().filter(s => s.authorId === user.id);
+  const totalLikes = shorts.reduce((acc, s) => acc + s.likes.length, 0);
+  const isOwn = user.id === currentUser.id;
+  const html = `
+    <div class="profile-header">
+      <div class="profile-top">
+        <div class="avatar lg">${initials(user.name)}</div>
+        <div class="profile-info">
+          <div class="profile-name">${escHtml(user.name)}</div>
+          <div class="profile-handle">@${escHtml(user.nick)}</div>
+          ${isOwn ? '<div class="profile-bio">Это твой профиль</div>' : ''}
+        </div>
+      </div>
+      <div class="profile-stats">
+        <div class="stat"><div class="val">${shorts.length}</div><div class="lbl">Шортсов</div></div>
+        <div class="stat"><div class="val">${totalLikes}</div><div class="lbl">Лайков</div></div>
+      </div>
+    </div>
+    <div class="section-title">Шортсы</div>
+    ${shorts.length ? shorts.map(s => renderShortCard(s, 'profile')).join('') : `<div class="empty-state"><p>Нет шортсов</p></div>`}
+  `;
+  document.getElementById(container).innerHTML = html;
+}
+
+// ════════════════════════════════════════════
+// USER MODAL
+// ════════════════════════════════════════════
+function openUserModal(userId) {
+  if (userId === currentUser.id) { goPage('profile'); return; }
+  const users = DB.getUsers();
+  const user = users.find(u => u.id === userId);
+  if (!user) return;
+  const shorts = DB.getShorts().filter(s => s.authorId === userId);
+  const totalLikes = shorts.reduce((acc, s) => acc + s.likes.length, 0);
+  document.getElementById('modal-content').innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;">
+      <div class="avatar lg">${initials(user.name)}</div>
+      <div>
+        <div style="font-size:20px;font-weight:800;">${escHtml(user.name)}</div>
+        <div style="color:var(--text2);font-size:14px;margin-bottom:10px;">@${escHtml(user.nick)}</div>
+        <div style="display:flex;gap:20px;">
+          <div class="stat"><div class="val">${shorts.length}</div><div class="lbl">Шортсов</div></div>
+          <div class="stat"><div class="val">${totalLikes}</div><div class="lbl">Лайков</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="section-title">Шортсы</div>
+    ${shorts.length ? shorts.map(s => renderShortCard(s)).join('') : `<div class="empty-state"><p>Нет шортсов</p></div>`}
+  `;
+  document.getElementById('user-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('user-modal').classList.remove('open');
+}
+function closeUserModal(e) {
+  if (e.target === document.getElementById('user-modal')) closeModal();
+}
+
+// ════════════════════════════════════════════
+// KEYBOARD
+// ════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if ((e.key === 'Enter') && document.getElementById('tab-login').style.display !== 'none') {
+    const nick = document.getElementById('login-nick');
+    const pass = document.getElementById('login-pass');
+    if (document.activeElement === nick || document.activeElement === pass) doLogin();
+  }
+  if ((e.key === 'Enter') && document.getElementById('tab-register').style.display !== 'none') {
+    const fields = ['reg-name','reg-nick','reg-pass'];
+    if (fields.includes(document.activeElement.id)) doRegister();
+  }
+});
+
+// ════════════════════════════════════════════
+// BOOTSTRAP: restore session
+// ════════════════════════════════════════════
+(function bootstrap() {
+  const sid = DB.getSession();
+  if (sid) {
+    const user = DB.getUsers().find(u => u.id === sid);
+    if (user) { initApp(user); return; }
+  }
+  document.getElementById('auth-screen').style.display = 'flex';
+})();
+</script>
 </body>
 </html>
+</thinking>
+
+Вот готовый файл! Я написал полный `index.html` с нуля. Вот что внутри:
+
+**Функциональность:**
+- Регистрация и вход через `localStorage` — после регистрации автоматический вход
+- Публикация шортсов с названием и описанием
+- Лента шортсов с превью-карточками
+- Лайки с анимацией
+- Удаление своих шортсов
+- Поиск пользователей по нику/имени
+- Поиск шортсов по названию/описанию
+- Профиль пользователя со статистикой (шортсов, лайков)
+- Просмотр профиля другого пользователя во всплывающем окне
+
+**Дизайн:**
+- Тёмная тема с фиолетовым акцентом
+- Левая панель как у Instagram (Главная, Поиск, Профиль)
+- Адаптивный дизайн — на мобиле панель сжимается до иконок
+- Анимации, градиентные превью шортсов, тосты-уведомления
+
+Просто открой этот файл в браузере — никаких библиотек или сервера не нужно.
+
+**Next, I can добавить систему подписок (подписаться/отписаться от пользователей) с лентой только из шортсов подписок. Would you like me to do that?**
